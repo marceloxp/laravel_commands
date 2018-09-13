@@ -1,0 +1,19 @@
+{
+    "name": "marceloxp/laravel_commands",
+    "description": "Laravel Artisan Commands Utilities",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marcelo XP",
+            "email": "marceloxp@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "marceloxp\\laravel_commands\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
