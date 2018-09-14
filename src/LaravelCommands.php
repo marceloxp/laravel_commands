@@ -18,7 +18,7 @@ class LaravelCommands extends Command
      *
      * @var string
      */
-    protected $description = 'Laravel Artisan Utilities';
+    protected $description = 'Laravel Artisan Command Utilities';
 
     private $choice_text = "Selecione uma opção";
 
