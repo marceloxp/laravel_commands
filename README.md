@@ -1,3 +1,15 @@
-# laravel_commands
+# Laravel Commands
 
-Laravel Artisan Utilities
+> Laravel Artisan Command Utilities
+
+## Install
+
+```bash
+composer require marceloxp/laravel_commands
+```
+
+Usage
+
+```bash
+php artisan xp
+```
