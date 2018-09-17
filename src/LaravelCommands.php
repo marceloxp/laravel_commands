@@ -50,30 +50,33 @@ class LaravelCommands extends Command
     private function printLogo($title = '', $subtitle = '')
     {
         global $app;
-        $laravel_version = sprintf('Laravel %s [%s]', $app->version(), env('APP_ENV'));
+
         $php_version = PHP_VERSION;
         $php_version = explode('-', $php_version);
         $php_version = array_shift($php_version);
         $php_version = 'PHP v' . $php_version;
 
+        $app_name        = mb_strtoupper(config('app.name'));
+        $app_env         = sprintf('env [%s]', env('APP_ENV'));
+        $laravel_version = sprintf('Laravel %s', $app->version());
+
         $this->clear();
-        $this->printLine($title, $php_version, $laravel_version);
+        $this->printLine($title, $app_name, $app_env);
         $this->info
         (
 "
-          ▐▄• ▄  ▄▄▄·    ▄▄▌   ▄▄▄· ▄▄▄   ▄▄▄·  ▌ ▐·▄▄▄ .▄▄▌      ▄• ▄▌▄▄▄▄▄▪  ▄▄▌  ▪  ▄▄▄▄▄▪  ▄▄▄ ..▄▄ · 
-           █▌█▌▪▐█ ▄█    ██•  ▐█ ▀█ ▀▄ █·▐█ ▀█ ▪█·█▌▀▄.▀·██•      █▪██▌•██  ██ ██•  ██ •██  ██ ▀▄.▀·▐█ ▀. 
-           ·██·  ██▀·    ██▪  ▄█▀▀█ ▐▀▀▄ ▄█▀▀█ ▐█▐█•▐▀▀▪▄██▪      █▌▐█▌ ▐█.▪▐█·██▪  ▐█· ▐█.▪▐█·▐▀▀▪▄▄▀▀▀█▄
-          ▪▐█·█▌▐█▪·•    ▐█▌▐▌▐█ ▪▐▌▐█•█▌▐█ ▪▐▌ ███ ▐█▄▄▌▐█▌▐▌    ▐█▄█▌ ▐█▌·▐█▌▐█▌▐▌▐█▌ ▐█▌·▐█▌▐█▄▄▌▐█▄▪▐█
-          •▀▀ ▀▀.▀       .▀▀▀  ▀  ▀ .▀  ▀ ▀  ▀ . ▀   ▀▀▀ .▀▀▀      ▀▀▀  ▀▀▀ ▀▀▀.▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀  ▀▀▀▀ "
+        ▐▄• ▄  ▄▄▄·     ▄▄▄· ▄▄▄  ▄▄▄▄▄▪  .▄▄ ·  ▄▄▄·  ▐ ▄     ▄• ▄▌▄▄▄▄▄▪  ▄▄▌  ▪  ▄▄▄▄▄▪  ▄▄▄ ..▄▄ · 
+         █▌█▌▪▐█ ▄█    ▐█ ▀█ ▀▄ █·•██  ██ ▐█ ▀. ▐█ ▀█ •█▌▐█    █▪██▌•██  ██ ██•  ██ •██  ██ ▀▄.▀·▐█ ▀. 
+         ·██·  ██▀·    ▄█▀▀█ ▐▀▀▄  ▐█.▪▐█·▄▀▀▀█▄▄█▀▀█ ▐█▐▐▌    █▌▐█▌ ▐█.▪▐█·██▪  ▐█· ▐█.▪▐█·▐▀▀▪▄▄▀▀▀█▄
+        ▪▐█·█▌▐█▪·•    ▐█ ▪▐▌▐█•█▌ ▐█▌·▐█▌▐█▄▪▐█▐█ ▪▐▌██▐█▌    ▐█▄█▌ ▐█▌·▐█▌▐█▌▐▌▐█▌ ▐█▌·▐█▌▐█▄▄▌▐█▄▪▐█
+        •▀▀ ▀▀.▀        ▀  ▀ .▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀▀  ▀  ▀ ▀▀ █▪     ▀▀▀  ▀▀▀ ▀▀▀.▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀  ▀▀▀▀ "
         );
         $text = $title;
         if (!empty($subtitle))
         {
             $text .= ' > ' . $subtitle; 
         }
-        $this->printLine($subtitle);
-        $this->breakLine();
+        $this->printLine($subtitle, '', $laravel_version . ' == ' . $php_version);
     }
 
     private function __getSingleLine()
@@ -201,6 +204,13 @@ class LaravelCommands extends Command
         $this->printLine();
     }
 
+// ███╗   ███╗███████╗███╗   ██╗██╗   ██╗    ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗██╗██████╗  █████╗ ██╗     
+// ████╗ ████║██╔════╝████╗  ██║██║   ██║    ██╔══██╗██╔══██╗██║████╗  ██║██╔════╝██║██╔══██╗██╔══██╗██║     
+// ██╔████╔██║█████╗  ██╔██╗ ██║██║   ██║    ██████╔╝██████╔╝██║██╔██╗ ██║██║     ██║██████╔╝███████║██║     
+// ██║╚██╔╝██║██╔══╝  ██║╚██╗██║██║   ██║    ██╔═══╝ ██╔══██╗██║██║╚██╗██║██║     ██║██╔═══╝ ██╔══██║██║     
+// ██║ ╚═╝ ██║███████╗██║ ╚████║╚██████╔╝    ██║     ██║  ██║██║██║ ╚████║╚██████╗██║██║     ██║  ██║███████╗
+// ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝
+
     private function printMainMenu()
     {
         $this->printLogo('MENU PRINCIPAL');
@@ -229,6 +239,13 @@ class LaravelCommands extends Command
         }
     }
 
+// ███╗   ███╗██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗
+// ████╗ ████║██║██╔════╝ ██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
+// ██╔████╔██║██║██║  ███╗██████╔╝███████║   ██║   █████╗  
+// ██║╚██╔╝██║██║██║   ██║██╔══██╗██╔══██║   ██║   ██╔══╝  
+// ██║ ╚═╝ ██║██║╚██████╔╝██║  ██║██║  ██║   ██║   ███████╗
+// ╚═╝     ╚═╝╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝
+
     private function printMigrateMenu()
     {
         $caption = 'MIGRATE COMMANDS';
@@ -238,6 +255,7 @@ class LaravelCommands extends Command
             'STATUS',
             'CREATE WITH MODEL',
             'CREATE CUSTOM',
+            'PREVIEW',
             'ROLLBACK',
             'MIGRATE',
             '<' => 'VOLTAR'
@@ -284,15 +302,17 @@ class LaravelCommands extends Command
                 $this->waitKey();
                 return $this->printMigrateMenu();
             break;
+            case 'PREVIEW':
+                $this->printLogo($caption, 'MIGRATION PREVIEW');
+                system('php artisan migrate --pretend');
+                $this->waitKey();
+                return $this->printMigrateMenu();
+            break;
             case 'CREATE WITH MODEL':
                 $this->printLogo($caption, 'CREATE WITH MODEL');
 
-                $folder_name = $this->ask('Folder name (ex: Models)', 'cancel');
-                if ($folder_name == 'cancel')
-                {
-                    $this->waitKey();
-                    return $this->printMigrateMenu();
-                }
+                $folder_name = $this->ask('Folder name (ex: Models)', 'Models');
+                $folder_name = (empty($folder_name)) ? 'Models' : $folder_name;
                 $folder_name .= '/';
 
                 $model_name = $this->ask('Model name (singular)', 'cancel');
@@ -379,6 +399,47 @@ class LaravelCommands extends Command
         }
     }
 
+// ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
+// ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝
+// ██║  ██║███████║   ██║   ███████║██████╔╝███████║███████╗█████╗  
+// ██║  ██║██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██║╚════██║██╔══╝  
+// ██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗
+// ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+
+    private function __getFieldsMetadata($p_table)
+    {
+        $query = sprintf
+        (
+            'SELECT * FROM `information_schema`.`COLUMNS` WHERE `table_schema` = "%s" AND table_name = "%s%s"',
+            env('DB_DATABASE'),
+            env('DB_TABLE_PREFIX'),
+            $p_table
+        );
+        $result = \DB::select($query);
+        $result = collect($result)->map(function($x){ return (array) $x; })->toArray();
+
+        return $result;
+    }
+
+    private function __getFieldNames($p_table, $p_add_comments = false)
+    {
+        $fields = $this->__getFieldsMetadata($p_table);
+        $result = [];
+        foreach ($fields as $field)
+        {
+            if ($p_add_comments)
+            {
+                $result[$field['COLUMN_NAME']] = $field['COLUMN_COMMENT'];
+            }
+            else
+            {
+                $result[] = $field['COLUMN_NAME'];
+            }
+        }
+
+        return $result;
+    }
+
     private function printDatabaseMenu()
     {
         $caption = 'DATABASE COMMANDS';
@@ -402,7 +463,6 @@ class LaravelCommands extends Command
                 $this->printLogo($caption, 'SHOW TABLES');
 
                 $tables = $this->__getTables();
-                $this->printLine('TABLES');
                 $this->printSingleArray($tables, 3);
 
                 $this->waitKey();
@@ -436,13 +496,13 @@ class LaravelCommands extends Command
                 $this->printSingleArray($tables, 3);
                 $this->printLine();
 
-                $table = $this->anticipate('Table', $tables_options);
+                $table          = $this->anticipate('Table', $tables_options);
+                $append_comment = $this->confirm('APPEND FIELD COMENT?', true);
 
-                $columns = \DB::connection()->getSchemaBuilder()->getColumnListing($table);
-                $columns_options = array_merge($columns);
-                usort($columns_options,function ($a,$b) { return strlen($a)-strlen($b); });
+                $fields = $this->__getFieldNames($table, $append_comment);
+
                 $this->printLine('COLUMNS OF ' . strtoupper($table) );
-                $this->printSingleArray($columns);
+                print_r($fields);
 
                 $this->waitKey();
                 return $this->printDatabaseMenu();
