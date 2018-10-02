@@ -6,203 +6,203 @@ use Illuminate\Console\Command;
 
 class LaravelCommands extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'xp';
+	/**
+	 * The name and signature of the console command.
+	 *
+	 * @var string
+	 */
+	protected $signature = 'xp';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Laravel Artisan Command Utilities';
+	/**
+	 * The console command description.
+	 *
+	 * @var string
+	 */
+	protected $description = 'Laravel Artisan Command Utilities';
 
-    private $choice_text = "Selecione uma opção";
+	private $choice_text = "Selecione uma opção";
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+	/**
+	 * Create a new command instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+	}
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        $this->printMainMenu();
-    }
+	/**
+	 * Execute the console command.
+	 *
+	 * @return mixed
+	 */
+	public function handle()
+	{
+		$this->printMainMenu();
+	}
 
-    private function clear()
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { system('cls'); } else { system('clear'); }
-    }
+	private function clear()
+	{
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { system('cls'); } else { system('clear'); }
+	}
 
-    private function printLogo($title = '', $subtitle = '')
-    {
-        global $app;
+	private function printLogo($title = '', $subtitle = '')
+	{
+		global $app;
 
-        $php_version = PHP_VERSION;
-        $php_version = explode('-', $php_version);
-        $php_version = array_shift($php_version);
-        $php_version = 'PHP v' . $php_version;
+		$php_version = PHP_VERSION;
+		$php_version = explode('-', $php_version);
+		$php_version = array_shift($php_version);
+		$php_version = 'PHP v' . $php_version;
 
-        $app_name        = mb_strtoupper(config('app.name'));
-        $app_env         = sprintf('env [%s]', env('APP_ENV'));
-        $laravel_version = sprintf('Laravel %s', $app->version());
+		$app_name        = mb_strtoupper(config('app.name'));
+		$app_env         = sprintf('env [%s]', env('APP_ENV'));
+		$laravel_version = sprintf('Laravel %s', $app->version());
 
-        $this->clear();
-        $this->printLine($title, $app_name, $app_env);
-        $this->info
-        (
+		$this->clear();
+		$this->printLine($title, $app_name, $app_env);
+		$this->info
+		(
 "
-        ▐▄• ▄  ▄▄▄·     ▄▄▄· ▄▄▄  ▄▄▄▄▄▪  .▄▄ ·  ▄▄▄·  ▐ ▄     ▄• ▄▌▄▄▄▄▄▪  ▄▄▌  ▪  ▄▄▄▄▄▪  ▄▄▄ ..▄▄ · 
-         █▌█▌▪▐█ ▄█    ▐█ ▀█ ▀▄ █·•██  ██ ▐█ ▀. ▐█ ▀█ •█▌▐█    █▪██▌•██  ██ ██•  ██ •██  ██ ▀▄.▀·▐█ ▀. 
-         ·██·  ██▀·    ▄█▀▀█ ▐▀▀▄  ▐█.▪▐█·▄▀▀▀█▄▄█▀▀█ ▐█▐▐▌    █▌▐█▌ ▐█.▪▐█·██▪  ▐█· ▐█.▪▐█·▐▀▀▪▄▄▀▀▀█▄
-        ▪▐█·█▌▐█▪·•    ▐█ ▪▐▌▐█•█▌ ▐█▌·▐█▌▐█▄▪▐█▐█ ▪▐▌██▐█▌    ▐█▄█▌ ▐█▌·▐█▌▐█▌▐▌▐█▌ ▐█▌·▐█▌▐█▄▄▌▐█▄▪▐█
-        •▀▀ ▀▀.▀        ▀  ▀ .▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀▀  ▀  ▀ ▀▀ █▪     ▀▀▀  ▀▀▀ ▀▀▀.▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀  ▀▀▀▀ "
-        );
-        $text = $title;
-        if (!empty($subtitle))
-        {
-            $text .= ' > ' . $subtitle; 
-        }
-        $this->printLine($subtitle, '', $laravel_version . ' == ' . $php_version);
-    }
+	▐▄• ▄  ▄▄▄·     ▄▄▄· ▄▄▄  ▄▄▄▄▄▪  .▄▄ ·  ▄▄▄·  ▐ ▄     ▄• ▄▌▄▄▄▄▄▪  ▄▄▌  ▪  ▄▄▄▄▄▪  ▄▄▄ ..▄▄ · 
+	 █▌█▌▪▐█ ▄█    ▐█ ▀█ ▀▄ █·•██  ██ ▐█ ▀. ▐█ ▀█ •█▌▐█    █▪██▌•██  ██ ██•  ██ •██  ██ ▀▄.▀·▐█ ▀. 
+	 ·██·  ██▀·    ▄█▀▀█ ▐▀▀▄  ▐█.▪▐█·▄▀▀▀█▄▄█▀▀█ ▐█▐▐▌    █▌▐█▌ ▐█.▪▐█·██▪  ▐█· ▐█.▪▐█·▐▀▀▪▄▄▀▀▀█▄
+	▪▐█·█▌▐█▪·•    ▐█ ▪▐▌▐█•█▌ ▐█▌·▐█▌▐█▄▪▐█▐█ ▪▐▌██▐█▌    ▐█▄█▌ ▐█▌·▐█▌▐█▌▐▌▐█▌ ▐█▌·▐█▌▐█▄▄▌▐█▄▪▐█
+	•▀▀ ▀▀.▀        ▀  ▀ .▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀▀  ▀  ▀ ▀▀ █▪     ▀▀▀  ▀▀▀ ▀▀▀.▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀  ▀▀▀▀ "
+		);
+		$text = $title;
+		if (!empty($subtitle))
+		{
+			$text .= ' > ' . $subtitle; 
+		}
+		$this->printLine($subtitle, '', $laravel_version . ' == ' . $php_version);
+	}
 
-    private function __getSingleLine()
-    {
-        return '-------------------------------------------------------------------------------------------------------------------';
-    }
+	private function __getSingleLine()
+	{
+		return '-------------------------------------------------------------------------------------------------------------------';
+	}
 
-    private function __getLine()
-    {
-        return '===================================================================================================================';
-    }
+	private function __getLine()
+	{
+		return '===================================================================================================================';
+	}
 
-    private function printSingleArray($p_array, $columns = 1)
-    {
-        if ($columns == 1)
-        {
-            print_r( implode(PHP_EOL, $p_array) );
-            $this->breakLine();
-            return;
-        }
+	private function printSingleArray($p_array, $columns = 1)
+	{
+		if ($columns == 1)
+		{
+			print_r( implode(PHP_EOL, $p_array) );
+			$this->breakLine();
+			return;
+		}
 
-        $pieces = array_chunk($p_array, ceil(count($p_array) / $columns));
+		$pieces = array_chunk($p_array, ceil(count($p_array) / $columns));
 
-        $maxlengths = [];
-        foreach ($pieces as $column)
-        {
-            $lengths = array_map('strlen', $column);
-            $max_length = max($lengths);
-            $maxlengths[] = $max_length;
-        }
+		$maxlengths = [];
+		foreach ($pieces as $column)
+		{
+			$lengths = array_map('strlen', $column);
+			$max_length = max($lengths);
+			$maxlengths[] = $max_length;
+		}
 
-        reset($pieces);
-        foreach ($pieces as $index => $piece)
-        {
-            foreach ($piece as $key => $value)
-            {
-                $pieces[$index][$key] = str_pad($pieces[$index][$key], ($maxlengths[$index] + 3), ' ');
-            }
-        }
-        
-        $k = 0;
-        $result = array_shift($pieces);
-        while (count($pieces) > 0)
-        {
-            $temp = array_shift($pieces);
-            foreach ($temp as $key => $value)
-            {
-                $result[$key] .= $value;
-            }
-            if ($k > 100)
-            {
-                die('Stack overflow');
-            }
-        }
+		reset($pieces);
+		foreach ($pieces as $index => $piece)
+		{
+			foreach ($piece as $key => $value)
+			{
+				$pieces[$index][$key] = str_pad($pieces[$index][$key], ($maxlengths[$index] + 3), ' ');
+			}
+		}
+		
+		$k = 0;
+		$result = array_shift($pieces);
+		while (count($pieces) > 0)
+		{
+			$temp = array_shift($pieces);
+			foreach ($temp as $key => $value)
+			{
+				$result[$key] .= $value;
+			}
+			if ($k > 100)
+			{
+				die('Stack overflow');
+			}
+		}
 
-        $this->printSingleArray($result);
-    }
+		$this->printSingleArray($result);
+	}
 
-    private function __getTables()
-    {
-        $tables_in_db = \DB::select('SHOW TABLES');
-        $db = sprintf('Tables_in_%s', env('DB_DATABASE'));
-        $table_prefix = env('DB_TABLE_PREFIX');
-        $tables = [];
-        foreach($tables_in_db as $table)
-        {
-            $table_name = str_replace($table_prefix, '', $table->{$db});
-            $tables[] = $table_name;
-        }
+	private function __getTables()
+	{
+		$tables_in_db = \DB::select('SHOW TABLES');
+		$db = sprintf('Tables_in_%s', env('DB_DATABASE'));
+		$table_prefix = env('DB_TABLE_PREFIX');
+		$tables = [];
+		foreach($tables_in_db as $table)
+		{
+			$table_name = str_replace($table_prefix, '', $table->{$db});
+			$tables[] = $table_name;
+		}
 
-        return $tables;
-    }
+		return $tables;
+	}
 
-    private function printSingleLine()
-    {
-        $this->info($this->__getSingleLine());
-    }
+	private function printSingleLine()
+	{
+		$this->info($this->__getSingleLine());
+	}
 
-    private function printLine($left = '', $center = '', $right = '')
-    {
-        $line = $this->__getLine();
-        $lcount = strlen($line);
+	private function printLine($left = '', $center = '', $right = '')
+	{
+		$line = $this->__getLine();
+		$lcount = strlen($line);
 
-        if (!empty($left))
-        {
-            $left = ' ' . $left . ' ';
-            $line = substr_replace($line, $left, 2, strlen($left));
-        }
+		if (!empty($left))
+		{
+			$left = ' ' . $left . ' ';
+			$line = substr_replace($line, $left, 2, strlen($left));
+		}
 
-        if (!empty($center))
-        {
-            $center = ' ' . $center . ' ';
-            $line = substr_replace($line, $center, ceil($lcount / 2)-(strlen($center) / 2), strlen($center));
-        }
+		if (!empty($center))
+		{
+			$center = ' ' . $center . ' ';
+			$line = substr_replace($line, $center, ceil($lcount / 2)-(strlen($center) / 2), strlen($center));
+		}
 
-        if (!empty($right))
-        {
-            $right = ' ' . $right . ' ';
-            $line = substr_replace($line, $right, $lcount-strlen($right)-2, strlen($right));
-        }
+		if (!empty($right))
+		{
+			$right = ' ' . $right . ' ';
+			$line = substr_replace($line, $right, $lcount-strlen($right)-2, strlen($right));
+		}
 
-        $this->info($line);
-    }
+		$this->info($line);
+	}
 
-    private function breakLine()
-    {
-        $this->info('');
-    }
+	private function breakLine()
+	{
+		$this->info('');
+	}
 
-    private function waitKey()
-    {
-        $this->printLine();
-        readline('Qualquer tecla para continuar');
-    }
+	private function waitKey()
+	{
+		$this->printLine();
+		readline('Qualquer tecla para continuar');
+	}
 
-    private function beginWindow($p_title)
-    {
-        $this->printLine();
-        $this->info($p_title);
-        $this->printLine();
-    }
+	private function beginWindow($p_title)
+	{
+		$this->printLine();
+		$this->info($p_title);
+		$this->printLine();
+	}
 
-    private function endWindow()
-    {
-        $this->printLine();
-    }
+	private function endWindow()
+	{
+		$this->printLine();
+	}
 
 // ███╗   ███╗███████╗███╗   ██╗██╗   ██╗    ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗██╗██████╗  █████╗ ██╗     
 // ████╗ ████║██╔════╝████╗  ██║██║   ██║    ██╔══██╗██╔══██╗██║████╗  ██║██╔════╝██║██╔══██╗██╔══██╗██║     
@@ -211,33 +211,33 @@ class LaravelCommands extends Command
 // ██║ ╚═╝ ██║███████╗██║ ╚████║╚██████╔╝    ██║     ██║  ██║██║██║ ╚████║╚██████╗██║██║     ██║  ██║███████╗
 // ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝
 
-    private function printMainMenu()
-    {
-        $this->printLogo('MENU PRINCIPAL');
-        $options = 
-        [
-            'MIGRATE',
-            'COMPOSER',
-            'DATABASE',
-            'X' => 'SAIR'
-        ];
+	private function printMainMenu()
+	{
+		$this->printLogo('MENU PRINCIPAL');
+		$options = 
+		[
+			'MIGRATE',
+			'COMPOSER',
+			'DATABASE',
+			'X' => 'SAIR'
+		];
 
-        $defaultIndex = 'X';
-        $option = $this->choice($this->choice_text, $options, $defaultIndex);
+		$defaultIndex = 'X';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
 
-        switch ($options[$option])
-        {
-            case 'MIGRATE':
-                $this->printMigrateMenu();
-            break;
-            case 'COMPOSER':
-                $this->printComposerMenu();
-            break;
-            case 'DATABASE':
-                $this->printDatabaseMenu();
-            break;
-        }
-    }
+		switch ($options[$option])
+		{
+			case 'MIGRATE':
+				$this->printMigrateMenu();
+			break;
+			case 'COMPOSER':
+				$this->printComposerMenu();
+			break;
+			case 'DATABASE':
+				$this->printDatabaseMenu();
+			break;
+		}
+	}
 
 // ███╗   ███╗██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗
 // ████╗ ████║██║██╔════╝ ██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
@@ -246,158 +246,158 @@ class LaravelCommands extends Command
 // ██║ ╚═╝ ██║██║╚██████╔╝██║  ██║██║  ██║   ██║   ███████╗
 // ╚═╝     ╚═╝╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝
 
-    private function printMigrateMenu()
-    {
-        $caption = 'MIGRATE COMMANDS';
-        $this->printLogo($caption);
-        $options = 
-        [
-            'STATUS',
-            'CREATE WITH MODEL',
-            'CREATE CUSTOM',
-            'PREVIEW',
-            'ROLLBACK',
-            'MIGRATE',
-            '<' => 'VOLTAR'
-        ];
-        $defaultIndex = '<';
-        $option = $this->choice($this->choice_text, $options, $defaultIndex);
+	private function printMigrateMenu()
+	{
+		$caption = 'MIGRATE COMMANDS';
+		$this->printLogo($caption);
+		$options = 
+		[
+			'STATUS',
+			'CREATE WITH MODEL',
+			'CREATE CUSTOM',
+			'PREVIEW',
+			'ROLLBACK',
+			'MIGRATE',
+			'<' => 'VOLTAR'
+		];
+		$defaultIndex = '<';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
 
-        switch ($options[$option])
-        {
-            case 'VOLTAR':
-                return $this->printMainMenu();
-            break;
-            case 'CREATE CUSTOM':
-                $this->printLogo($caption, 'CREATE MIGRATION');
-                $this->info('php artisan make:migration {action}_to_{table} --table={table}');
-                $action = $this->ask('Action', 'cancel');
-                if ($action == 'cancel')
-                {
-                    $this->waitKey();
-                    return $this->printMigrateMenu();
-                }
+		switch ($options[$option])
+		{
+			case 'VOLTAR':
+				return $this->printMainMenu();
+			break;
+			case 'CREATE CUSTOM':
+				$this->printLogo($caption, 'CREATE MIGRATION');
+				$this->info('php artisan make:migration {action}_to_{table} --table={table}');
+				$action = $this->ask('Action', 'cancel');
+				if ($action == 'cancel')
+				{
+					$this->waitKey();
+					return $this->printMigrateMenu();
+				}
 
-                $table = $this->ask('Table', 'cancel');
-                if ($table == 'cancel')
-                {
-                    $this->waitKey();
-                    return $this->printMigrateMenu();
-                }
+				$table = $this->ask('Table', 'cancel');
+				if ($table == 'cancel')
+				{
+					$this->waitKey();
+					return $this->printMigrateMenu();
+				}
 
-                $command = sprintf('php artisan make:migration %s_to_%s --table=%s', $action, $table, $table);
-                if ($this->confirm($command))
-                {
-                    $this->beginWindow('EXECUTANDO CRIAÇÃO DO MIGRATE');
-                    system($command);
-                    $this->endWindow();
-                }
+				$command = sprintf('php artisan make:migration %s_to_%s --table=%s', $action, $table, $table);
+				if ($this->confirm($command))
+				{
+					$this->beginWindow('EXECUTANDO CRIAÇÃO DO MIGRATE');
+					system($command);
+					$this->endWindow();
+				}
 
-                $this->waitKey();
-                return $this->printMigrateMenu();
-            break;
-            case 'STATUS':
-                $this->printLogo($caption, 'MIGRATION STATUS');
-                system('php artisan migrate:status');
-                $this->waitKey();
-                return $this->printMigrateMenu();
-            break;
-            case 'PREVIEW':
-                $this->printLogo($caption, 'MIGRATION PREVIEW');
-                system('php artisan migrate --pretend');
-                $this->waitKey();
-                return $this->printMigrateMenu();
-            break;
-            case 'CREATE WITH MODEL':
-                $this->printLogo($caption, 'CREATE WITH MODEL');
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+			case 'STATUS':
+				$this->printLogo($caption, 'MIGRATION STATUS');
+				system('php artisan migrate:status');
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+			case 'PREVIEW':
+				$this->printLogo($caption, 'MIGRATION PREVIEW');
+				system('php artisan migrate --pretend');
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+			case 'CREATE WITH MODEL':
+				$this->printLogo($caption, 'CREATE WITH MODEL');
 
-                $folder_name = $this->ask('Folder name (ex: Models)', 'Models');
-                $folder_name = (empty($folder_name)) ? 'Models' : $folder_name;
-                $folder_name .= '/';
+				$folder_name = $this->ask('Folder name (ex: Models)', 'Models');
+				$folder_name = (empty($folder_name)) ? 'Models' : $folder_name;
+				$folder_name .= '/';
 
-                $model_name = $this->ask('Model name (singular)', 'cancel');
-                if ($model_name == 'cancel')
-                {
-                    $this->waitKey();
-                    return $this->printMigrateMenu();
-                }
+				$model_name = $this->ask('Model name (singular)', 'cancel');
+				if ($model_name == 'cancel')
+				{
+					$this->waitKey();
+					return $this->printMigrateMenu();
+				}
 
-                $command = sprintf('php artisan make:model %s%s -m', $folder_name, $model_name);
-                if ($this->confirm($command, 1))
-                {
-                    $this->beginWindow('EXECUTANDO CRIAÇÃO DA MODEL E MIGRATE');
-                    system($command);
-                    $this->endWindow();
-                }
+				$command = sprintf('php artisan make:model %s%s -m', $folder_name, $model_name);
+				if ($this->confirm($command, 1))
+				{
+					$this->beginWindow('EXECUTANDO CRIAÇÃO DA MODEL E MIGRATE');
+					system($command);
+					$this->endWindow();
+				}
 
-                $this->waitKey();
-                return $this->printMigrateMenu();
-            break;
-            case 'ROLLBACK':
-                $this->printLogo($caption, 'ROLLBACK MIGRATION');
-                system('php artisan migrate:status');
-                $quant = $this->ask('Quantos passos para trás?', 1);
-                $quant = intval($quant);
-                if ($quant < 1)
-                {
-                    $this->info('Entrada de dados inválida.');
-                    return $this->printMainMenu();
-                }
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+			case 'ROLLBACK':
+				$this->printLogo($caption, 'ROLLBACK MIGRATION');
+				system('php artisan migrate:status');
+				$quant = $this->ask('Quantos passos para trás?', 1);
+				$quant = intval($quant);
+				if ($quant < 1)
+				{
+					$this->info('Entrada de dados inválida.');
+					return $this->printMainMenu();
+				}
 
-                $this->beginWindow('PREVIEW DO ROLLBACK');
-                system(sprintf('php artisan migrate:rollback --step=%s --pretend', $quant));
-                $this->endWindow();
+				$this->beginWindow('PREVIEW DO ROLLBACK');
+				system(sprintf('php artisan migrate:rollback --step=%s --pretend', $quant));
+				$this->endWindow();
 
-                if ($this->confirm('Prosseguir com o Rollback?'))
-                {
-                    system(sprintf('php artisan migrate:rollback --step=%s', $quant));
-                }
+				if ($this->confirm('Prosseguir com o Rollback?'))
+				{
+					system(sprintf('php artisan migrate:rollback --step=%s', $quant));
+				}
 
-                $this->waitKey();
-                return $this->printMigrateMenu();
-            break;
-            case 'MIGRATE':
-                $this->printLogo($caption, 'MIGRATE');
-                if (!$this->confirm('Prosseguir com o Migrate?'))
-                {
-                    return $this->printMigrateMenu();
-                }
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+			case 'MIGRATE':
+				$this->printLogo($caption, 'MIGRATE');
+				if (!$this->confirm('Prosseguir com o Migrate?'))
+				{
+					return $this->printMigrateMenu();
+				}
 
-                $this->beginWindow('EXECUTANDO MIGRATE....');
-                system('php artisan migrate');
-                $this->endWindow();
+				$this->beginWindow('EXECUTANDO MIGRATE....');
+				system('php artisan migrate');
+				$this->endWindow();
 
-                $this->waitKey();
-                return $this->printMigrateMenu();
-            break;
-        }
-    }
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+		}
+	}
 
-    private function printComposerMenu()
-    {
-        $caption = 'COMPOSER COMMANDS';
-        $this->printLogo($caption);
-        $options = 
-        [
-            'Dump Auto-Load',
-            '<' => 'Voltar'
-        ];
-        $defaultIndex = '<';
-        $option = $this->choice($this->choice_text, $options, $defaultIndex);
+	private function printComposerMenu()
+	{
+		$caption = 'COMPOSER COMMANDS';
+		$this->printLogo($caption);
+		$options = 
+		[
+			'Dump Auto-Load',
+			'<' => 'Voltar'
+		];
+		$defaultIndex = '<';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
 
-        switch ($options[$option])
-        {
-            case 'Voltar':
-                return $this->printMainMenu();
-            break;
-            case 'Dump Auto-Load':
-                $this->printLogo($caption, 'DUMP AUTO-LOAD');
-                system('composer dumpautoload');
-                $this->waitKey();
-                return $this->printComposerMenu();
-            break;
-        }
-    }
+		switch ($options[$option])
+		{
+			case 'Voltar':
+				return $this->printMainMenu();
+			break;
+			case 'Dump Auto-Load':
+				$this->printLogo($caption, 'DUMP AUTO-LOAD');
+				system('composer dumpautoload');
+				$this->waitKey();
+				return $this->printComposerMenu();
+			break;
+		}
+	}
 
 // ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
 // ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝
@@ -406,107 +406,221 @@ class LaravelCommands extends Command
 // ██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗
 // ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
 
-    private function __getFieldsMetadata($p_table)
-    {
-        $query = sprintf
-        (
-            'SELECT * FROM `information_schema`.`COLUMNS` WHERE `table_schema` = "%s" AND table_name = "%s%s"',
-            env('DB_DATABASE'),
-            env('DB_TABLE_PREFIX'),
-            $p_table
-        );
-        $result = \DB::select($query);
-        $result = collect($result)->map(function($x){ return (array) $x; })->toArray();
+	private function __getFieldsMetadata($p_table)
+	{
+		$query = sprintf
+		(
+			'SELECT * FROM `information_schema`.`COLUMNS` WHERE `table_schema` = "%s" AND table_name = "%s%s"',
+			env('DB_DATABASE'),
+			env('DB_TABLE_PREFIX'),
+			$p_table
+		);
+		$result = \DB::select($query);
+		$result = collect($result)->map(function($x){ return (array) $x; })->toArray();
 
-        return $result;
-    }
+		return $result;
+	}
 
-    private function __getFieldNames($p_table, $p_add_comments = false)
-    {
-        $fields = $this->__getFieldsMetadata($p_table);
-        $result = [];
-        foreach ($fields as $field)
-        {
-            if ($p_add_comments)
-            {
-                $result[$field['COLUMN_NAME']] = $field['COLUMN_COMMENT'];
-            }
-            else
-            {
-                $result[] = $field['COLUMN_NAME'];
-            }
-        }
+	private function __getFieldNames($p_table, $p_add_comments = false)
+	{
+		$fields = $this->__getFieldsMetadata($p_table);
+		$result = [];
+		foreach ($fields as $field)
+		{
+			if ($p_add_comments)
+			{
+				$result[$field['COLUMN_NAME']] = $field['COLUMN_COMMENT'];
+			}
+			else
+			{
+				$result[] = $field['COLUMN_NAME'];
+			}
+		}
 
-        return $result;
-    }
+		return $result;
+	}
 
-    private function printDatabaseMenu()
-    {
-        $caption = 'DATABASE COMMANDS';
-        $this->printLogo($caption);
-        $options = 
-        [
-            'SHOW CONFIG',
-            'SHOW TABLES',
-            'GET FIELD NAMES',
-            '<' => 'VOLTAR'
-        ];
-        $defaultIndex = '<';
-        $option = $this->choice($this->choice_text, $options, $defaultIndex);
+	private function printTables()
+	{
+		$tables = $this->__getTables();
+		sort($tables);
+		$tables_options = array_merge($tables);
+		usort($tables_options,function ($a,$b) { return strlen($a) - strlen($b); });
+		$this->breakLine();
+		$this->printLine('TABLES');
+		$this->printSingleArray($tables, 3);
+		$this->printLine();
+		return $tables_options;
+	}
 
-        switch ($options[$option])
-        {
-            case 'VOLTAR':
-                return $this->printMainMenu();
-            break;
-            case 'SHOW TABLES':
-                $this->printLogo($caption, 'SHOW TABLES');
+	private function printDatabaseMenu()
+	{
+		$caption = 'DATABASE COMMANDS';
+		$this->printLogo($caption);
+		$options = 
+		[
+			'SHOW CONFIG',
+			'SHOW TABLES',
+			'SHOW TABLE FIELDS',
+			'RULES GENERATOR',
+			'DUMP DATABSE',
+			'<' => 'VOLTAR'
+		];
+		$defaultIndex = '<';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
 
-                $tables = $this->__getTables();
-                $this->printSingleArray($tables, 3);
+		switch ($options[$option])
+		{
+			case 'VOLTAR':
+				return $this->printMainMenu();
+			break;
+			case 'SHOW TABLES':
+				$this->printLogo($caption, 'SHOW TABLES');
 
-                $this->waitKey();
-                return $this->printDatabaseMenu();
-            break;
-            case 'SHOW CONFIG':
-                $this->printLogo($caption, 'SHOW CONFIG');
+				$tables = $this->__getTables();
+				$this->printSingleArray($tables, 3);
 
-                $config = \DB::getConfig();
-                $headers = ['Property', 'Value'];
-                $data = [];
+				$this->waitKey();
+				return $this->printDatabaseMenu();
+			break;
+			case 'SHOW CONFIG':
+				$this->printLogo($caption, 'SHOW CONFIG');
 
-                foreach ($config as $key => $value)
-                {
-                    $data[] = ['Property' => $key, 'Value' => $value];
-                }
+				$config = \DB::getConfig();
+				$headers = ['Property', 'Value'];
+				$data = [];
 
-                $this->table($headers, $data);
+				foreach ($config as $key => $value)
+				{
+					$data[] = ['Property' => $key, 'Value' => $value];
+				}
 
-                $this->waitKey();
-                return $this->printDatabaseMenu();
-            break;
-            case 'GET FIELD NAMES':
-                $this->printLogo($caption, 'GET FIELD NAMES');
+				$this->table($headers, $data);
 
-                $tables = $this->__getTables();
-                sort($tables);
-                $tables_options = array_merge($tables);
-                usort($tables_options,function ($a,$b) { return strlen($a)-strlen($b); });
-                $this->printLine('TABLES');
-                $this->printSingleArray($tables, 3);
-                $this->printLine();
+				$this->waitKey();
+				return $this->printDatabaseMenu();
+			break;
+			case 'SHOW TABLE FIELDS':
+				$this->printLogo($caption, 'GET FIELD NAMES');
 
-                $table          = $this->anticipate('Table', $tables_options);
-                $append_comment = $this->confirm('APPEND FIELD COMENT?', true);
+				$tables_options = $this->printTables();
+				$table          = $this->anticipate('Table', $tables_options);
+				$append_comment = $this->confirm('APPEND FIELD COMENT?', true);
 
-                $fields = $this->__getFieldNames($table, $append_comment);
+				$fields = $this->__getFieldNames($table, $append_comment);
 
-                $this->printLine('COLUMNS OF ' . strtoupper($table) );
-                print_r($fields);
+				$this->printLine('COLUMNS OF ' . strtoupper($table) );
+				if ($append_comment)
+				{
+					print_r($fields);
+				}
+				else
+				{
+					$this->printSingleArray($fields);
+				}
 
-                $this->waitKey();
-                return $this->printDatabaseMenu();
-            break;
-        }
-    }
+				$this->waitKey();
+				return $this->printDatabaseMenu();
+			break;
+			case 'RULES GENERATOR':
+				$this->DatabaseRulesGenerator();
+			break;
+			case 'DUMP DATABSE':
+				$this->DatabaseDump();
+			break;
+		}
+	}
+
+	private function DatabaseRulesGenerator()
+	{
+		// 'campaign_id'          => 'required',
+		// 'name'                 => 'required|max:150',
+		// 'slug'                 => ['required', 'max:150', new UniqueProductCampaign()],
+		// 'description'          => 'max:150',
+		// 'dealers'              => 'required',
+		// 'title'                => 'max:150|required',
+		// 'price'                => 'max:150',
+		// 'conditions'           => 'max:512',
+		// 'features'             => 'max:512',
+		// 'color_title'          => 'max:64|required',
+		// 'color_price'          => 'max:64|required',
+		// 'color_conditions'     => 'max:64|required',
+		// 'color_features'       => 'max:64|required',
+		// 'legaltext'            => 'max:5000',
+		// 'modalinit_title'      => 'max:512|required',
+		// 'modalinit_subtitle'   => 'max:512|required',
+		// 'modalfooter'          => 'max:512|required',
+		// 'form_title'           => 'max:512|required',
+		// 'form_max_title'       => 'max:1024|required_without:form_max_description',
+		// 'form_max_description' => 'max:1024|required_without:form_max_title',
+		// 'mail_subject'         => 'max:128|required',
+		// 'mail_sender'          => 'max:128',
+		// 'mail_text'            => 'max:512|required',
+		// 'mail_url'             => 'max:512',
+		// 'voucher_title'        => 'max:512|required',
+		// 'voucher_subtitle'     => 'max:512',
+		// 'voucher_legal'        => 'max:5000|required',
+		// 'voucher_exit'         => 'max:512|required',
+		// 'posform_title'        => 'max:512|required',
+		// 'posform_subtitle'     => 'max:512|required',
+		// 'active'               => 'in:Sim,Não|required'
+
+		$tables_options = $this->printTables();
+		$table          = $this->anticipate('Table', $tables_options);
+		$fields         = $this->__getFieldsMetadata($table);
+
+		print_r($fields); die;
+
+		$data = [];
+		foreach ($fields as $field)
+		{
+			$field_name     = $field['COLUMN_NAME'];
+			$field_length   = $field['CHARACTER_MAXIMUM_LENGTH'];
+			$field_required = ($field['IS_NULLABLE'] == 'NO');
+
+			$data[$field_name] = [];
+			if (!empty($field_length))
+			{
+				$data[$field_name][] = sprintf('max:%s', $field_length);
+			}
+
+			if (!empty($field_required))
+			{
+				$data[$field_name][] = 'required';
+			}
+		}
+
+		$result = [];
+		reset($data);
+		foreach ($data as $field_name => $value)
+		{
+			if (!empty($value))
+			{
+				$result[] = sprintf("'%s' => '%s'", $field_name, implode('|', $value));
+			}
+		}
+
+		$this->printSingleArray($result);
+	}
+
+	private function DatabaseDump()
+	{
+		try
+		{
+			$libfile = dirname(__FILE__) . '/Mysqldump.php';
+			include_once($libfile);
+
+			$settings = 
+			[
+				'no-data' => true
+			];
+			$str_cnx = sprintf('mysql:host=%s;dbname=%s', env('DB_HOST'), env('DB_DATABASE'));
+			$dump = new \Ifsnop\Mysqldump\Mysqldump($str_cnx, env('DB_USERNAME'), env('DB_PASSWORD'), $settings);
+			$dump->start('dump.sql');
+		}
+		catch (\Exception $e)
+		{
+			echo 'Dump error: ' . $e->getMessage();
+		}
+	}
 }

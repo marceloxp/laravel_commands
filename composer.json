@@ -25,5 +25,7 @@
         }
     },
     "minimum-stability": "dev",
-    "require": {}
+    "require-dev": {
+        "ifsnop/mysqldump-php": "2.*"
+    }
 }
