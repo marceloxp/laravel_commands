@@ -89,6 +89,13 @@ class LaravelCommands extends Command
 		return '===================================================================================================================';
 	}
 
+	private function __getArrayKeyMaxLength($p_array)
+	{
+		$keys    = array_keys($p_array);
+		$lengths = array_map('strlen', $keys);
+		return max($lengths);
+	}
+
 	private function printAssocArrayToTable($p_array)
 	{
 		$keys       = array_keys($p_array);
@@ -578,11 +585,11 @@ class LaravelCommands extends Command
 		// 'posform_subtitle'     => 'max:512|required',
 		// 'active'               => 'in:Sim,Não|required'
 
+		$caption = 'DATABASE COMMANDS';
+
 		$tables_options = $this->printTables();
 		$table          = $this->anticipate('Table', $tables_options);
 		$fields         = $this->__getFieldsMetadata($table);
-
-		print_r($fields); die;
 
 		$data = [];
 		foreach ($fields as $field)
@@ -603,17 +610,23 @@ class LaravelCommands extends Command
 			}
 		}
 
+		$max_length = $this->__getArrayKeyMaxLength($data);
+
 		$result = [];
 		reset($data);
 		foreach ($data as $field_name => $value)
 		{
 			if (!empty($value))
 			{
-				$result[] = sprintf("'%s' => '%s'", $field_name, implode('|', $value));
+				$result[] = sprintf("'%s'%s=> '%s'", $field_name, str_pad('', ($max_length + 2 - strlen($field_name) )), implode('|', $value));
 			}
 		}
 
+		$this->printLogo($caption, 'RULES GENERATED');
 		$this->printSingleArray($result);
+
+		$this->waitKey();
+		return $this->printDatabaseMenu();
 	}
 
 	private function DatabaseDump()
