@@ -3,7 +3,7 @@
 > Laravel Artisan Command Utilities
 
 ## Screen
-![Screen](https://github.com/marceloxp/laravel_commands/blob/master/screen.png "Screen")
+![Screen](https://github.com/marceloxp/laravel_commands/blob/master/screen-v2.png "Screen")
 
 ## Install
 
