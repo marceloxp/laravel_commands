@@ -595,11 +595,20 @@ class LaravelCommands extends Command
 		$data = [];
 		foreach ($fields as $field)
 		{
-			$field_name     = $field['COLUMN_NAME'];
-			$field_length   = $field['CHARACTER_MAXIMUM_LENGTH'];
-			$field_required = ($field['IS_NULLABLE'] == 'NO');
-
+			$field_name        = $field['COLUMN_NAME'];
+			$field_length      = $field['CHARACTER_MAXIMUM_LENGTH'];
+			$field_required    = ($field['IS_NULLABLE'] == 'NO');
+			$field_enum        = (substr($field['COLUMN_TYPE'], 0, 4) == 'enum');
 			$data[$field_name] = [];
+
+			if ($field_enum)
+			{
+				preg_match("/^enum\(\'(.*)\'\)$/", $field['COLUMN_TYPE'], $matches);
+				$options = explode("','", $matches[1]);
+				$options = implode(',', $options);
+				$data[$field_name][] = sprintf('in:%s', $options);
+			}
+
 			if (!empty($field_length))
 			{
 				$data[$field_name][] = sprintf('max:%s', $field_length);
