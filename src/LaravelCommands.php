@@ -622,6 +622,22 @@ class LaravelCommands extends Command
 			if ($this->confirm('Reset Auto-Increment ?')) { $settings['reset-auto-increment'] = true; }
 			if ($this->confirm('Drop Database ?')       ) { $settings['add-drop-database'] = true; }
 			if ($this->confirm('Drop Tables ?')         ) { $settings['add-drop-table'] = true; }
+
+			$sconf = 
+			[
+				'Dump Data'              => ($settings['no-data']              == false) ? 'Sim' : 'Não',
+				'Reset Auto-Increment ?' => ($settings['reset-auto-increment'] == true ) ? 'Sim' : 'Não',
+				'Drop Database ?'        => ($settings['add-drop-database']    == true ) ? 'Sim' : 'Não',
+				'Drop Tables ?'          => ($settings['add-drop-table']       == true ) ? 'Sim' : 'Não',
+			];
+
+			$this->printLogo($caption, 'DUMP DATABASE');
+			print_r($sconf);
+			if ($this->confirm('Execute Dump ?'))
+			{
+				$this->waitKey();
+				return $this->printDatabaseMenu();
+			}
 		
 			$libfile = dirname(__FILE__) . '/Mysqldump.php';
 			include_once($libfile);
@@ -632,7 +648,7 @@ class LaravelCommands extends Command
 			$dump = new \Ifsnop\Mysqldump\Mysqldump($str_cnx, env('DB_USERNAME'), env('DB_PASSWORD'), $settings);
 			$dump->start('dump.sql');
 
-			$this->endWindow('DUMP EFETUADO');
+			$this->endWindow();
 			$this->waitKey();
 			return $this->printDatabaseMenu();
 		}
