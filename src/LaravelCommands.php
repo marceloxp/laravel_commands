@@ -89,6 +89,19 @@ class LaravelCommands extends Command
 		return '===================================================================================================================';
 	}
 
+	private function printAssocArrayToTable($p_array)
+	{
+		$keys       = array_keys($p_array);
+		$lengths    = array_map('strlen', $keys);
+		$max_length = max($lengths) + 3;
+
+		foreach ($p_array as $key => $value)
+		{
+			$line = sprintf('%s%s', str_pad($key, $max_length, '.'), $value);
+			$this->info($line);
+		}
+	}
+
 	private function printSingleArray($p_array, $columns = 1)
 	{
 		if ($columns == 1)
@@ -632,8 +645,8 @@ class LaravelCommands extends Command
 			];
 
 			$this->printLogo($caption, 'DUMP DATABASE');
-			print_r($sconf);
-			if ($this->confirm('Execute Dump ?'))
+			$this->printAssocArrayToTable($sconf);
+			if (!$this->confirm('Execute Dump ?'))
 			{
 				$this->waitKey();
 				return $this->printDatabaseMenu();
@@ -646,9 +659,10 @@ class LaravelCommands extends Command
 
 			$str_cnx = sprintf('mysql:host=%s;dbname=%s', env('DB_HOST'), env('DB_DATABASE'));
 			$dump = new \Ifsnop\Mysqldump\Mysqldump($str_cnx, env('DB_USERNAME'), env('DB_PASSWORD'), $settings);
+			$file_dump = realpath('dump.sql');
+			$this->info('Destino: ' . $file_dump);
 			$dump->start('dump.sql');
 
-			$this->endWindow();
 			$this->waitKey();
 			return $this->printDatabaseMenu();
 		}
