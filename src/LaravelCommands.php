@@ -607,16 +607,34 @@ class LaravelCommands extends Command
 	{
 		try
 		{
-			$libfile = dirname(__FILE__) . '/Mysqldump.php';
-			include_once($libfile);
+			$caption = 'DATABASE COMMANDS';
+			$this->printLogo($caption, 'DUMP DATABASE');
 
 			$settings = 
 			[
-				'no-data' => true
+				'no-data'              => true,
+				'reset-auto-increment' => false,
+				'add-drop-database'    => false,
+				'add-drop-table'       => false
 			];
+
+			if ($this->confirm('Dump Data ?')           ) { $settings['no-data'] = false; }
+			if ($this->confirm('Reset Auto-Increment ?')) { $settings['reset-auto-increment'] = true; }
+			if ($this->confirm('Drop Database ?')       ) { $settings['add-drop-database'] = true; }
+			if ($this->confirm('Drop Tables ?')         ) { $settings['add-drop-table'] = true; }
+		
+			$libfile = dirname(__FILE__) . '/Mysqldump.php';
+			include_once($libfile);
+
+			$this->beginWindow('EXECUTANDO DUMP DA BASE');
+
 			$str_cnx = sprintf('mysql:host=%s;dbname=%s', env('DB_HOST'), env('DB_DATABASE'));
 			$dump = new \Ifsnop\Mysqldump\Mysqldump($str_cnx, env('DB_USERNAME'), env('DB_PASSWORD'), $settings);
 			$dump->start('dump.sql');
+
+			$this->endWindow('DUMP EFETUADO');
+			$this->waitKey();
+			return $this->printDatabaseMenu();
 		}
 		catch (\Exception $e)
 		{
