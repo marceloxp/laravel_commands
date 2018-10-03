@@ -96,7 +96,7 @@ class LaravelCommands extends Command
 		return max($lengths);
 	}
 
-	private function printAssocArrayToTable($p_array)
+	private function printAssocArrayToList($p_array)
 	{
 		$keys       = array_keys($p_array);
 		$lengths    = array_map('strlen', $keys);
@@ -104,7 +104,7 @@ class LaravelCommands extends Command
 
 		foreach ($p_array as $key => $value)
 		{
-			$line = sprintf('%s%s', str_pad($key, $max_length, '.'), $value);
+			$line = sprintf('%s%s', str_pad($key.' ', $max_length, '.'), $value);
 			$this->info($line);
 		}
 	}
@@ -521,18 +521,19 @@ class LaravelCommands extends Command
 				return $this->printDatabaseMenu();
 			break;
 			case 'SHOW TABLE FIELDS':
-				$this->printLogo($caption, 'GET FIELD NAMES');
 
 				$tables_options = $this->printTables();
 				$table          = $this->anticipate('Table', $tables_options);
 				$append_comment = $this->confirm('APPEND FIELD COMENT?', true);
 
+				$this->printLogo($caption, 'SHOW TABLE FIELDS');
+				
 				$fields = $this->__getFieldNames($table, $append_comment);
 
 				$this->printLine('COLUMNS OF ' . strtoupper($table) );
 				if ($append_comment)
 				{
-					print_r($fields);
+					$this->printAssocArrayToList($fields);
 				}
 				else
 				{
@@ -658,7 +659,7 @@ class LaravelCommands extends Command
 			];
 
 			$this->printLogo($caption, 'DUMP DATABASE');
-			$this->printAssocArrayToTable($sconf);
+			$this->printAssocArrayToList($sconf);
 			if (!$this->confirm('Execute Dump ?'))
 			{
 				$this->waitKey();
