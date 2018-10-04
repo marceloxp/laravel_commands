@@ -521,7 +521,6 @@ class LaravelCommands extends Command
 				return $this->printDatabaseMenu();
 			break;
 			case 'SHOW TABLE FIELDS':
-
 				$tables_options = $this->printTables();
 				$table          = $this->anticipate('Table', $tables_options);
 				$append_comment = $this->confirm('APPEND FIELD COMENT?', true);
@@ -628,12 +627,17 @@ class LaravelCommands extends Command
 		{
 			if (!empty($value))
 			{
-				$result[] = sprintf("'%s'%s=> '%s'", $field_name, str_pad('', ($max_length + 2 - strlen($field_name) )), implode('|', $value));
+				$result[] = sprintf("	'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
 			}
 		}
 
 		$this->printLogo($caption, 'RULES GENERATED');
+		$this->breakLine();
+		$this->info('return');
+		$this->info('[');
 		$this->printSingleArray($result);
+		$this->info('];');
+		$this->breakLine();
 
 		$this->waitKey();
 		return $this->printDatabaseMenu();
@@ -654,10 +658,10 @@ class LaravelCommands extends Command
 				'add-drop-table'       => false
 			];
 
-			if ($this->confirm('Dump Data ?')           ) { $settings['no-data'] = false; }
-			if ($this->confirm('Reset Auto-Increment ?')) { $settings['reset-auto-increment'] = true; }
-			if ($this->confirm('Drop Database ?')       ) { $settings['add-drop-database'] = true; }
-			if ($this->confirm('Drop Tables ?')         ) { $settings['add-drop-table'] = true; }
+			if ($this->confirm('Dump Data ?')           ) { $settings['no-data']              = false; }
+			if ($this->confirm('Reset Auto-Increment ?')) { $settings['reset-auto-increment'] = true;  }
+			if ($this->confirm('Drop Database ?')       ) { $settings['add-drop-database']    = true;  }
+			if ($this->confirm('Drop Tables ?')         ) { $settings['add-drop-table']       = true;  }
 
 			$sconf = 
 			[
@@ -682,7 +686,8 @@ class LaravelCommands extends Command
 
 			$str_cnx = sprintf('mysql:host=%s;dbname=%s', env('DB_HOST'), env('DB_DATABASE'));
 			$dump = new \Ifsnop\Mysqldump\Mysqldump($str_cnx, env('DB_USERNAME'), env('DB_PASSWORD'), $settings);
-			$file_dump = realpath('dump.sql');
+
+			$file_dump = sprintf('%s/dump.sql', getcwd());
 			$this->info('Destino: ' . $file_dump);
 			$dump->start('dump.sql');
 
