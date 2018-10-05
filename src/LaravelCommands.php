@@ -3,6 +3,7 @@
 namespace marceloxp\laravel_commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class LaravelCommands extends Command
 {
@@ -237,6 +238,7 @@ class LaravelCommands extends Command
 		$options = 
 		[
 			'MIGRATE',
+			'SEEDS',
 			'COMPOSER',
 			'DATABASE',
 			'X' => 'SAIR'
@@ -249,6 +251,9 @@ class LaravelCommands extends Command
 		{
 			case 'MIGRATE':
 				$this->printMigrateMenu();
+			break;
+			case 'SEEDS':
+				$this->printSeedsMenu();
 			break;
 			case 'COMPOSER':
 				$this->printComposerMenu();
@@ -417,6 +422,120 @@ class LaravelCommands extends Command
 				return $this->printComposerMenu();
 			break;
 		}
+	}
+
+	// ███████╗███████╗███████╗██████╗ ███████╗
+	// ██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝
+	// ███████╗█████╗  █████╗  ██║  ██║███████╗
+	// ╚════██║██╔══╝  ██╔══╝  ██║  ██║╚════██║
+	// ███████║███████╗███████╗██████╔╝███████║
+	// ╚══════╝╚══════╝╚══════╝╚═════╝ ╚══════╝
+
+	private function printSeedsMenu()
+	{
+		$caption = 'SEEDS COMMANDS';
+		$this->printLogo($caption);
+		$options = 
+		[
+			'CREATE',
+			'EXECUTE',
+			'<' => 'VOLTAR'
+		];
+		$defaultIndex = '<';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
+
+		switch ($options[$option])
+		{
+			case 'CREATE':
+				$this->printLogo($caption, 'CREATE');
+				return $this->seedsCreate();
+			break;
+			case 'EXECUTE':
+				$this->printLogo($caption, 'EXECUTE');
+				return $this->seedExecute();
+			break;
+			case 'VOLTAR':
+				return $this->printMainMenu();
+			break;
+		}
+	}
+
+	private function ___getModels()
+	{
+		$result = [];
+		$path = app_path('Models');
+		$files = File::allFiles($path);
+		foreach ($files as $file)
+		{
+			$filename = $file->getPathname();
+			$path_parts = pathinfo($filename);
+			$result[] = $path_parts['filename'];
+		}
+		sort($result);
+
+		return $result;
+	}
+
+	private function seedsCreate()
+	{
+		$models = $this->___getModels();
+		$models[] = '-------------------------------------------------------';
+		$models[] = 'CANCEL';
+
+		$this->printLine('MODELS');
+		$this->printSingleArray($models);
+
+		$model = $this->anticipate('Choose Model', $models);
+
+		if ( ($model === 'CANCEL') || ($model === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printSeedsMenu();
+		}
+
+		$command = sprintf('php artisan make:seed %ssSeeder', $model);
+		$this->info('COMMAND: ' . $command);
+		$execute = $this->confirm('CREATE SEED?', false);
+		if ($execute)
+		{
+			$this->beginWindow('EXECUTANDO CRIAÇÃO DO SEED');
+			system($command);
+			$this->endWindow();
+		}
+
+		$this->waitKey();
+		return $this->printSeedsMenu();
+	}
+
+	private function seedExecute()
+	{
+		$models = $this->___getModels();
+		$models[] = '-------------------------------------------------------';
+		$models[] = 'CANCEL';
+
+		$this->printLine('MODELS');
+		$this->printSingleArray($models);
+
+		$model = $this->anticipate('Choose Model', $models);
+
+		if ( ($model === 'CANCEL') || ($model === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printSeedsMenu();
+		}
+
+		$command = sprintf('php artisan db:seed --class=%ssSeeder', $model);
+		$this->info('COMMAND: ' . $command);
+		$execute = $this->confirm('EXECUTE SEED?', false);
+		if ($execute)
+		{
+			$this->beginWindow('EXECUTING SEED');
+			system($command);
+			$this->endWindow();
+		}
+
+		$this->waitKey();
+		return $this->printSeedsMenu();
 	}
 
 // ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
