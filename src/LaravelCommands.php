@@ -438,7 +438,8 @@ class LaravelCommands extends Command
 		$options = 
 		[
 			'CREATE',
-			'EXECUTE',
+			'EXECUTE ONE',
+			'EXECUTE ALL',
 			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
@@ -450,9 +451,13 @@ class LaravelCommands extends Command
 				$this->printLogo($caption, 'CREATE');
 				return $this->seedsCreate();
 			break;
-			case 'EXECUTE':
-				$this->printLogo($caption, 'EXECUTE');
-				return $this->seedExecute();
+			case 'EXECUTE ONE':
+				$this->printLogo($caption, 'EXECUTE ONE');
+				return $this->seedExecuteOne();
+			break;
+			case 'EXECUTE ALL':
+				$this->printLogo($caption, 'EXECUTE ALL');
+				return $this->seedExecuteAll();
 			break;
 			case 'VOLTAR':
 				return $this->printMainMenu();
@@ -507,7 +512,7 @@ class LaravelCommands extends Command
 		return $this->printSeedsMenu();
 	}
 
-	private function seedExecute()
+	private function seedExecuteOne()
 	{
 		$models = $this->___getModels();
 		$models[] = '-------------------------------------------------------';
@@ -530,6 +535,22 @@ class LaravelCommands extends Command
 		if ($execute)
 		{
 			$this->beginWindow('EXECUTING SEED');
+			system($command);
+			$this->endWindow();
+		}
+
+		$this->waitKey();
+		return $this->printSeedsMenu();
+	}
+
+	private function seedExecuteAll()
+	{
+		$command = 'php artisan db:seed';
+		$this->info('COMMAND: ' . $command);
+		$execute = $this->confirm('EXECUTE ALL SEED?', false);
+		if ($execute)
+		{
+			$this->beginWindow('EXECUTING ALL SEED');
 			system($command);
 			$this->endWindow();
 		}

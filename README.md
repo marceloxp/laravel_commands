@@ -29,6 +29,12 @@ php artisan xp
 - Rollback
 - Execute migration
 
+### Seeds
+
+- Create
+- Execute One
+- Execute All
+
 ### Composer
 
 - Dump autoload
