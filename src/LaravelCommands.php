@@ -404,19 +404,19 @@ class LaravelCommands extends Command
 		$this->printLogo($caption);
 		$options = 
 		[
-			'Dump Auto-Load',
-			'<' => 'Voltar'
+			'DUMP AUTOLOAD',
+			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
 		$option = $this->choice($this->choice_text, $options, $defaultIndex);
 
 		switch ($options[$option])
 		{
-			case 'Voltar':
+			case 'VOLTAR':
 				return $this->printMainMenu();
 			break;
-			case 'Dump Auto-Load':
-				$this->printLogo($caption, 'DUMP AUTO-LOAD');
+			case 'DUMP AUTOLOAD':
+				$this->printLogo($caption, 'DUMP AUTOLOAD');
 				system('composer dumpautoload');
 				$this->waitKey();
 				return $this->printComposerMenu();
