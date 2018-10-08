@@ -21,7 +21,7 @@ class LaravelCommands extends Command
 	 */
 	protected $description = 'Laravel Artisan Command Utilities';
 
-	private $choice_text = 'Selecione uma opção';
+	private $choice_text = 'Select an option';
 
 	/**
 	 * Create a new command instance.
@@ -149,7 +149,7 @@ class LaravelCommands extends Command
 			}
 			if ($k > 100)
 			{
-				die('Stack overflow');
+				die('Stack overflow!');
 			}
 		}
 
@@ -210,7 +210,7 @@ class LaravelCommands extends Command
 	private function waitKey()
 	{
 		$this->printLine();
-		readline('Qualquer tecla para continuar');
+		readline('Press any key to continue.');
 	}
 
 	private function beginWindow($p_title)
@@ -225,12 +225,12 @@ class LaravelCommands extends Command
 		$this->printLine();
 	}
 
-// ███╗   ███╗███████╗███╗   ██╗██╗   ██╗    ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗██╗██████╗  █████╗ ██╗     
-// ████╗ ████║██╔════╝████╗  ██║██║   ██║    ██╔══██╗██╔══██╗██║████╗  ██║██╔════╝██║██╔══██╗██╔══██╗██║     
-// ██╔████╔██║█████╗  ██╔██╗ ██║██║   ██║    ██████╔╝██████╔╝██║██╔██╗ ██║██║     ██║██████╔╝███████║██║     
-// ██║╚██╔╝██║██╔══╝  ██║╚██╗██║██║   ██║    ██╔═══╝ ██╔══██╗██║██║╚██╗██║██║     ██║██╔═══╝ ██╔══██║██║     
-// ██║ ╚═╝ ██║███████╗██║ ╚████║╚██████╔╝    ██║     ██║  ██║██║██║ ╚████║╚██████╗██║██║     ██║  ██║███████╗
-// ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝
+// ███╗   ███╗ █████╗ ██╗███╗   ██╗    ███╗   ███╗███████╗███╗   ██╗██╗   ██╗
+// ████╗ ████║██╔══██╗██║████╗  ██║    ████╗ ████║██╔════╝████╗  ██║██║   ██║
+// ██╔████╔██║███████║██║██╔██╗ ██║    ██╔████╔██║█████╗  ██╔██╗ ██║██║   ██║
+// ██║╚██╔╝██║██╔══██║██║██║╚██╗██║    ██║╚██╔╝██║██╔══╝  ██║╚██╗██║██║   ██║
+// ██║ ╚═╝ ██║██║  ██║██║██║ ╚████║    ██║ ╚═╝ ██║███████╗██║ ╚████║╚██████╔╝
+// ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝    ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝ 
 
 	private function printMainMenu()
 	{
@@ -313,7 +313,7 @@ class LaravelCommands extends Command
 				$command = sprintf('php artisan make:migration %s_to_%s --table=%s', $action, $table, $table);
 				if ($this->confirm($command))
 				{
-					$this->beginWindow('EXECUTANDO CRIAÇÃO DO MIGRATE');
+					$this->beginWindow('EXECUTING MIGRATE CREATION');
 					system($command);
 					$this->endWindow();
 				}
@@ -350,7 +350,7 @@ class LaravelCommands extends Command
 				$command = sprintf('php artisan make:model %s%s -m', $folder_name, $model_name);
 				if ($this->confirm($command, 1))
 				{
-					$this->beginWindow('EXECUTANDO CRIAÇÃO DA MODEL E MIGRATE');
+					$this->beginWindow('EXECUTING MODEL AND MIGRATE CREATION');
 					system($command);
 					$this->endWindow();
 				}
@@ -361,19 +361,19 @@ class LaravelCommands extends Command
 			case 'ROLLBACK':
 				$this->printLogo($caption, 'ROLLBACK MIGRATION');
 				system('php artisan migrate:status');
-				$quant = $this->ask('Quantos passos para trás?', 1);
+				$quant = $this->ask('Steps to back', 1);
 				$quant = intval($quant);
 				if ($quant < 1)
 				{
-					$this->info('Entrada de dados inválida.');
+					$this->info('Invalid data entry.');
 					return $this->printMainMenu();
 				}
 
-				$this->beginWindow('PREVIEW DO ROLLBACK');
+				$this->beginWindow('ROLLBACK PREVIEW');
 				system(sprintf('php artisan migrate:rollback --step=%s --pretend', $quant));
 				$this->endWindow();
 
-				if ($this->confirm('Prosseguir com o Rollback?'))
+				if ($this->confirm('Proceed Rollback?'))
 				{
 					system(sprintf('php artisan migrate:rollback --step=%s', $quant));
 				}
@@ -383,12 +383,12 @@ class LaravelCommands extends Command
 			break;
 			case 'MIGRATE':
 				$this->printLogo($caption, 'MIGRATE');
-				if (!$this->confirm('Prosseguir com o Migrate?'))
+				if (!$this->confirm('Proceed Migrate?'))
 				{
 					return $this->printMigrateMenu();
 				}
 
-				$this->beginWindow('EXECUTANDO MIGRATE....');
+				$this->beginWindow('EXECUTING MIGRATE....');
 				system('php artisan migrate');
 				$this->endWindow();
 
@@ -503,7 +503,7 @@ class LaravelCommands extends Command
 		$execute = $this->confirm('CREATE SEED?', false);
 		if ($execute)
 		{
-			$this->beginWindow('EXECUTANDO CRIAÇÃO DO SEED');
+			$this->beginWindow('EXECUTING SEED CREATION');
 			system($command);
 			$this->endWindow();
 		}
@@ -798,17 +798,17 @@ class LaravelCommands extends Command
 				'add-drop-table'       => false
 			];
 
-			if ($this->confirm('Dump Data ?')           ) { $settings['no-data']              = false; }
-			if ($this->confirm('Reset Auto-Increment ?')) { $settings['reset-auto-increment'] = true;  }
-			if ($this->confirm('Drop Database ?')       ) { $settings['add-drop-database']    = true;  }
-			if ($this->confirm('Drop Tables ?')         ) { $settings['add-drop-table']       = true;  }
+			if ($this->confirm('Dump Data?')           ) { $settings['no-data']              = false; }
+			if ($this->confirm('Reset Auto-Increment?')) { $settings['reset-auto-increment'] = true;  }
+			if ($this->confirm('Drop Database?')       ) { $settings['add-drop-database']    = true;  }
+			if ($this->confirm('Drop Tables?')         ) { $settings['add-drop-table']       = true;  }
 
 			$sconf = 
 			[
 				'Dump Data'              => ($settings['no-data']              == false) ? 'Sim' : 'Não',
-				'Reset Auto-Increment ?' => ($settings['reset-auto-increment'] == true ) ? 'Sim' : 'Não',
-				'Drop Database ?'        => ($settings['add-drop-database']    == true ) ? 'Sim' : 'Não',
-				'Drop Tables ?'          => ($settings['add-drop-table']       == true ) ? 'Sim' : 'Não',
+				'Reset Auto-Increment?'  => ($settings['reset-auto-increment'] == true ) ? 'Sim' : 'Não',
+				'Drop Database?'         => ($settings['add-drop-database']    == true ) ? 'Sim' : 'Não',
+				'Drop Tables?'           => ($settings['add-drop-table']       == true ) ? 'Sim' : 'Não',
 			];
 
 			$this->printLogo($caption, 'DUMP DATABASE');
@@ -819,7 +819,7 @@ class LaravelCommands extends Command
 				return $this->printDatabaseMenu();
 			}
 		
-			$libfile = dirname(__FILE__) . '/Mysqldump.php';
+			$libfile = dirname(__FILE__) . '/mysqldump.php';
 			include_once($libfile);
 
 			$this->beginWindow('EXECUTANDO DUMP DA BASE');
