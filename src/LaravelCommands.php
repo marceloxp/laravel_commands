@@ -388,7 +388,7 @@ class LaravelCommands extends Command
 					return $this->printMigrateMenu();
 				}
 
-				$this->beginWindow('EXECUTING MIGRATE....');
+				$this->beginWindow('EXECUTING MIGRATE');
 				system('php artisan migrate');
 				$this->endWindow();
 
@@ -808,7 +808,7 @@ class LaravelCommands extends Command
 				'Dump Data'              => ($settings['no-data']              == false) ? 'Sim' : 'Não',
 				'Reset Auto-Increment?'  => ($settings['reset-auto-increment'] == true ) ? 'Sim' : 'Não',
 				'Drop Database?'         => ($settings['add-drop-database']    == true ) ? 'Sim' : 'Não',
-				'Drop Tables?'           => ($settings['add-drop-table']       == true ) ? 'Sim' : 'Não',
+				'Drop Tables?'           => ($settings['add-drop-table']       == true ) ? 'Sim' : 'Não' 
 			];
 
 			$this->printLogo($caption, 'DUMP DATABASE');
@@ -822,7 +822,7 @@ class LaravelCommands extends Command
 			$libfile = dirname(__FILE__) . '/mysqldump.php';
 			include_once($libfile);
 
-			$this->beginWindow('EXECUTANDO DUMP DA BASE');
+			$this->beginWindow('EXECUTING DATABASE DUMP');
 
 			$str_cnx = sprintf('mysql:host=%s;dbname=%s', env('DB_HOST'), env('DB_DATABASE'));
 			$dump = new \Ifsnop\Mysqldump\Mysqldump($str_cnx, env('DB_USERNAME'), env('DB_PASSWORD'), $settings);
