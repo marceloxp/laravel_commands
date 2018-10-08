@@ -727,6 +727,8 @@ class LaravelCommands extends Command
 
 		$caption = 'DATABASE COMMANDS';
 
+		$this->printLogo($caption, 'RULES GENERATOR');
+
 		$tables_options = $this->printTables();
 		$table          = $this->anticipate('Table', $tables_options);
 		$fields         = $this->__getFieldsMetadata($table);
@@ -748,14 +750,14 @@ class LaravelCommands extends Command
 				$data[$field_name][] = sprintf('in:%s', $options);
 			}
 
-			if (!empty($field_length))
-			{
-				$data[$field_name][] = sprintf('max:%s', $field_length);
-			}
-
 			if (!empty($field_required))
 			{
 				$data[$field_name][] = 'required';
+			}
+
+			if (!empty($field_length))
+			{
+				$data[$field_name][] = sprintf('max:%s', $field_length);
 			}
 		}
 
@@ -771,7 +773,7 @@ class LaravelCommands extends Command
 			}
 		}
 
-		$this->printLogo($caption, 'RULES GENERATED');
+		$this->printLogo($caption, 'RULES GENERATED - TABLE: ' . $table);
 		$this->breakLine();
 		$this->info('return');
 		$this->info('[');
