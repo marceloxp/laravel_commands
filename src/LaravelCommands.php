@@ -584,6 +584,10 @@ class LaravelCommands extends Command
 	private function __getFieldNames($p_table, $p_add_comments = false)
 	{
 		$fields = $this->__getFieldsMetadata($p_table);
+		if (empty($fields))
+		{
+			return null;
+		}
 		$result = [];
 		foreach ($fields as $field)
 		{
@@ -603,6 +607,10 @@ class LaravelCommands extends Command
 	private function printTables()
 	{
 		$tables = $this->__getTables();
+		if (empty($tables))
+		{
+			return $tables;
+		}
 		sort($tables);
 		$tables_options = array_merge($tables);
 		usort($tables_options,function ($a,$b) { return strlen($a) - strlen($b); });
@@ -624,6 +632,7 @@ class LaravelCommands extends Command
 			'SHOW TABLE FIELDS',
 			'RULES GENERATOR',
 			'DUMP DATABSE',
+			'DROP ALL TABLES AND MIGRATE',
 			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
@@ -638,7 +647,14 @@ class LaravelCommands extends Command
 				$this->printLogo($caption, 'SHOW TABLES');
 
 				$tables = $this->__getTables();
-				$this->printSingleArray($tables, 3);
+				if (!empty($tables))
+				{
+					$this->printSingleArray($tables, 3);
+				}
+				else
+				{
+					$this->info('No tables found.');
+				}
 
 				$this->waitKey();
 				return $this->printDatabaseMenu();
@@ -661,25 +677,8 @@ class LaravelCommands extends Command
 				return $this->printDatabaseMenu();
 			break;
 			case 'SHOW TABLE FIELDS':
-				$tables_options = $this->printTables();
-				$table          = $this->anticipate('Table', $tables_options);
-				$append_comment = $this->confirm('APPEND FIELD COMENT?', true);
-
 				$this->printLogo($caption, 'SHOW TABLE FIELDS');
-				
-				$fields = $this->__getFieldNames($table, $append_comment);
-
-				$this->printLine('COLUMNS OF ' . strtoupper($table) );
-				if ($append_comment)
-				{
-					$this->printAssocArrayToList($fields);
-				}
-				else
-				{
-					$this->printSingleArray($fields);
-				}
-
-				$this->waitKey();
+				$this->showTableFields();
 				return $this->printDatabaseMenu();
 			break;
 			case 'RULES GENERATOR':
@@ -688,7 +687,54 @@ class LaravelCommands extends Command
 			case 'DUMP DATABSE':
 				$this->DatabaseDump();
 			break;
+			case 'DROP ALL TABLES AND MIGRATE':
+				$this->printLogo($caption, 'DROP ALL TABLES AND MIGRATE');
+				if (!$this->confirm('Drop *ALL TABLES* and proceed migrate?'))
+				{
+					return $this->printMigrateMenu();
+				}
+
+				$seed = '';
+				if ($this->confirm('Seed tables?'))
+				{
+					$seed = ' --seed';
+				}
+
+				$this->beginWindow('EXECUTING MIGRATE');
+				system('php artisan migrate:fresh' . $seed);
+				$this->endWindow();
+
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
 		}
+	}
+
+	private function showTableFields()
+	{
+		$tables_options = $this->printTables();
+		if (empty($tables_options))
+		{
+			$this->info('No tables found.');
+			$this->waitKey();
+			return false;
+		}
+		$table          = $this->anticipate('Table', $tables_options);
+		$append_comment = $this->confirm('APPEND FIELD COMENT?', true);
+
+		$fields = $this->__getFieldNames($table, $append_comment);
+
+		$this->printLine('COLUMNS OF ' . strtoupper($table) );
+		if ($append_comment)
+		{
+			$this->printAssocArrayToList($fields);
+		}
+		else
+		{
+			$this->printSingleArray($fields);
+		}
+
+		$this->waitKey();
 	}
 
 	private function DatabaseRulesGenerator()
@@ -730,6 +776,12 @@ class LaravelCommands extends Command
 		$this->printLogo($caption, 'RULES GENERATOR');
 
 		$tables_options = $this->printTables();
+		if (empty($tables_options))
+		{
+			$this->info('No tables found.');
+			$this->waitKey();
+			return $this->printDatabaseMenu();
+		}
 		$table          = $this->anticipate('Table', $tables_options);
 		$fields         = $this->__getFieldsMetadata($table);
 
