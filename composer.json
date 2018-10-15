@@ -3,7 +3,7 @@
     "description": "Laravel Artisan Commands Utilities",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.1",
+    "version": "1.0.6",
     "authors": [
         {
             "name": "Marcelo XP",
@@ -26,7 +26,6 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
     "require-dev": {
         "ifsnop/mysqldump-php": "2.*"
     }
