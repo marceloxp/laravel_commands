@@ -45,7 +45,7 @@ class LaravelCommands extends Command
 
 	private function clear()
 	{
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { system('cls'); } else { system('clear'); }
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { $this->breakLine(5); } else { system('clear'); }
 	}
 
 	private function printLogo($title = '', $subtitle = '')
@@ -64,14 +64,14 @@ class LaravelCommands extends Command
 		$this->clear();
 		$this->printLine($title, $app_name, $app_env);
 		$this->info
-		(
+("	    __                                __   ______                                          __    
+	   / /   ____ __________ __   _____  / /  / ____/___  ____ ___  ____ ___  ____ _____  ____/ /____
+	  / /   / __ `/ ___/ __ `/ | / / _ \/ /  / /   / __ \/ __ `__ \/ __ `__ \/ __ `/ __ \/ __  / ___/
+	 / /___/ /_/ / /  / /_/ /| |/ /  __/ /  / /___/ /_/ / / / / / / / / / / / /_/ / / / / /_/ (__  ) 
+	/_____/\__,_/_/   \__,_/ |___/\___/_/   \____/\____/_/ /_/ /_/_/ /_/ /_/\__,_/_/ /_/\__,_/____/  
 "
-	▐▄• ▄  ▄▄▄·     ▄▄▄· ▄▄▄  ▄▄▄▄▄▪  .▄▄ ·  ▄▄▄·  ▐ ▄     ▄• ▄▌▄▄▄▄▄▪  ▄▄▌  ▪  ▄▄▄▄▄▪  ▄▄▄ ..▄▄ · 
-	 █▌█▌▪▐█ ▄█    ▐█ ▀█ ▀▄ █·•██  ██ ▐█ ▀. ▐█ ▀█ •█▌▐█    █▪██▌•██  ██ ██•  ██ •██  ██ ▀▄.▀·▐█ ▀. 
-	 ·██·  ██▀·    ▄█▀▀█ ▐▀▀▄  ▐█.▪▐█·▄▀▀▀█▄▄█▀▀█ ▐█▐▐▌    █▌▐█▌ ▐█.▪▐█·██▪  ▐█· ▐█.▪▐█·▐▀▀▪▄▄▀▀▀█▄
-	▪▐█·█▌▐█▪·•    ▐█ ▪▐▌▐█•█▌ ▐█▌·▐█▌▐█▄▪▐█▐█ ▪▐▌██▐█▌    ▐█▄█▌ ▐█▌·▐█▌▐█▌▐▌▐█▌ ▐█▌·▐█▌▐█▄▄▌▐█▄▪▐█
-	•▀▀ ▀▀.▀        ▀  ▀ .▀  ▀ ▀▀▀ ▀▀▀ ▀▀▀▀  ▀  ▀ ▀▀ █▪     ▀▀▀  ▀▀▀ ▀▀▀.▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀  ▀▀▀▀ "
 		);
+
 		$text = $title;
 		if (!empty($subtitle))
 		{
@@ -202,9 +202,12 @@ class LaravelCommands extends Command
 		$this->info($line);
 	}
 
-	private function breakLine()
+	private function breakLine($p_lines = 1)
 	{
-		$this->info('');
+		for($k = 0; $k < $p_lines; $k++)
+		{
+			$this->info('');
+		}
 	}
 
 	private function waitKey()
@@ -340,7 +343,7 @@ class LaravelCommands extends Command
 				$folder_name = (empty($folder_name)) ? 'Models' : $folder_name;
 				$folder_name .= '/';
 
-				$model_name = $this->ask('Model name (singular)', 'cancel');
+				$model_name = $this->ask('Model name (Singular)', 'cancel');
 				if ($model_name == 'cancel')
 				{
 					$this->waitKey();
@@ -490,9 +493,9 @@ class LaravelCommands extends Command
 		$this->printLine('MODELS');
 		$this->printSingleArray($models);
 
-		$model = $this->anticipate('Choose Model', $models);
+		$model = $this->anticipate('Choose Model [cancel]', $models);
 
-		if ( ($model === 'CANCEL') || ($model === '-------------------------------------------------------') )
+		if ( ($model === 'CANCEL') || ($model === null) || ($model === '-------------------------------------------------------') )
 		{
 			$this->waitKey();
 			return $this->printSeedsMenu();
@@ -521,9 +524,9 @@ class LaravelCommands extends Command
 		$this->printLine('MODELS');
 		$this->printSingleArray($models);
 
-		$model = $this->anticipate('Choose Model', $models);
+		$model = $this->anticipate('Choose Model [cancel]', $models);
 
-		if ( ($model === 'CANCEL') || ($model === '-------------------------------------------------------') )
+		if ( ($model === 'CANCEL') || ($model === null) || ($model === '-------------------------------------------------------') )
 		{
 			$this->waitKey();
 			return $this->printSeedsMenu();
@@ -630,6 +633,7 @@ class LaravelCommands extends Command
 			'SHOW CONFIG',
 			'SHOW TABLES',
 			'SHOW TABLE FIELDS',
+			'CSV TABLE FIELDS',
 			'RULES GENERATOR',
 			'DUMP DATABSE',
 			'DROP ALL TABLES AND MIGRATE',
@@ -679,6 +683,11 @@ class LaravelCommands extends Command
 			case 'SHOW TABLE FIELDS':
 				$this->printLogo($caption, 'SHOW TABLE FIELDS');
 				$this->showTableFields();
+				return $this->printDatabaseMenu();
+			break;
+			case 'CSV TABLE FIELDS':
+				$this->printLogo($caption, 'CSV TABLE FIELDS');
+				$this->csvTableFields();
 				return $this->printDatabaseMenu();
 			break;
 			case 'RULES GENERATOR':
@@ -733,6 +742,26 @@ class LaravelCommands extends Command
 		{
 			$this->printSingleArray($fields);
 		}
+
+		$this->waitKey();
+	}
+
+	private function csvTableFields()
+	{
+		$tables_options = $this->printTables();
+		if (empty($tables_options))
+		{
+			$this->info('No tables found.');
+			$this->waitKey();
+			return false;
+		}
+
+		$table  = $this->anticipate('Table', $tables_options);
+		$fields = $this->__getFieldNames($table, false);
+
+		$result = "'" . implode("','", $fields) . "'";
+
+		$this->info($result);
 
 		$this->waitKey();
 	}

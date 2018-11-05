@@ -1,10 +1,10 @@
 # Laravel Commands
 
-> Laravel Artisan Command Utilities v1.0.5
+> Laravel Artisan Command Utilities v1.0.7
 
 ## Screen
 
-![Screen](https://raw.githubusercontent.com/marceloxp/laravel_commands/master/screen-v2.png "Screen")
+![Screen](https://raw.githubusercontent.com/marceloxp/laravel_commands/master/screen-v3.png "Screen")
 
 ## Install
 
