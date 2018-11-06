@@ -902,7 +902,7 @@ class LaravelCommands extends Command
 				return $this->printDatabaseMenu();
 			}
 		
-			$libfile = dirname(__FILE__) . '/mysqldump.php';
+			$libfile = dirname(__FILE__) . '/Mysqldump.php';
 			include_once($libfile);
 
 			$this->beginWindow('EXECUTING DATABASE DUMP');
