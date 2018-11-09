@@ -114,8 +114,7 @@ class LaravelCommands extends Command
 	{
 		if ($columns == 1)
 		{
-			print_r( implode(PHP_EOL, $p_array) );
-			$this->breakLine();
+			$this->info( implode(PHP_EOL, $p_array) );
 			return;
 		}
 
@@ -811,8 +810,8 @@ class LaravelCommands extends Command
 			$this->waitKey();
 			return $this->printDatabaseMenu();
 		}
-		$table          = $this->anticipate('Table', $tables_options);
-		$fields         = $this->__getFieldsMetadata($table);
+		$table  = $this->anticipate('Table', $tables_options);
+		$fields = $this->__getFieldsMetadata($table);
 
 		$data = [];
 		foreach ($fields as $field)
@@ -850,16 +849,28 @@ class LaravelCommands extends Command
 		{
 			if (!empty($value))
 			{
-				$result[] = sprintf("	'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
+				if ($field_name != 'id')
+				{
+					$result[] = sprintf("	'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
+				}
 			}
 		}
 
 		$this->printLogo($caption, 'RULES GENERATED - TABLE: ' . $table);
 		$this->breakLine();
-		$this->info('return');
-		$this->info('[');
+
+		$this->info(
+		"
+public static function validate(\$request, \$id = '')
+{
+	\$rules = 
+	[");
 		$this->printSingleArray($result);
-		$this->info('];');
+		$this->info("	];
+	return Role::_validate(\$request, \$rules, \$id);
+}
+		");
+
 		$this->breakLine();
 
 		$this->waitKey();
