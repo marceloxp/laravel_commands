@@ -285,6 +285,7 @@ class LaravelCommands extends Command
 			'PREVIEW',
 			'ROLLBACK',
 			'MIGRATE',
+			'DROP ALL TABLES AND MIGRATE',
 			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
@@ -392,6 +393,26 @@ class LaravelCommands extends Command
 
 				$this->beginWindow('EXECUTING MIGRATE');
 				system('php artisan migrate');
+				$this->endWindow();
+
+				$this->waitKey();
+				return $this->printMigrateMenu();
+			break;
+			case 'DROP ALL TABLES AND MIGRATE':
+				$this->printLogo($caption, 'DROP ALL TABLES AND MIGRATE');
+				if (!$this->confirm('Drop *ALL TABLES* and proceed migrate?'))
+				{
+					return $this->printMigrateMenu();
+				}
+
+				$seed = '';
+				if ($this->confirm('Seed tables?'))
+				{
+					$seed = ' --seed';
+				}
+
+				$this->beginWindow('EXECUTING MIGRATE');
+				system('php artisan migrate:fresh' . $seed);
 				$this->endWindow();
 
 				$this->waitKey();
@@ -635,7 +656,6 @@ class LaravelCommands extends Command
 			'CSV TABLE FIELDS',
 			'RULES GENERATOR',
 			'DUMP DATABSE',
-			'DROP ALL TABLES AND MIGRATE',
 			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
@@ -694,26 +714,6 @@ class LaravelCommands extends Command
 			break;
 			case 'DUMP DATABSE':
 				$this->DatabaseDump();
-			break;
-			case 'DROP ALL TABLES AND MIGRATE':
-				$this->printLogo($caption, 'DROP ALL TABLES AND MIGRATE');
-				if (!$this->confirm('Drop *ALL TABLES* and proceed migrate?'))
-				{
-					return $this->printMigrateMenu();
-				}
-
-				$seed = '';
-				if ($this->confirm('Seed tables?'))
-				{
-					$seed = ' --seed';
-				}
-
-				$this->beginWindow('EXECUTING MIGRATE');
-				system('php artisan migrate:fresh' . $seed);
-				$this->endWindow();
-
-				$this->waitKey();
-				return $this->printMigrateMenu();
 			break;
 		}
 	}
@@ -851,7 +851,7 @@ class LaravelCommands extends Command
 			{
 				if ($field_name != 'id')
 				{
-					$result[] = sprintf("	'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
+					$result[] = sprintf("		'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
 				}
 			}
 		}
