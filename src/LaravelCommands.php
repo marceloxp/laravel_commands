@@ -488,6 +488,22 @@ class LaravelCommands extends Command
 		}
 	}
 
+	private function ___getSeeders()
+	{
+		$result = [];
+		$path = base_path('database/seeds');
+		$files = File::allFiles($path);
+		foreach ($files as $file)
+		{
+			$filename = $file->getBasename();
+			$path_parts = pathinfo($filename);
+			$result[] = $path_parts['filename'];
+		}
+		sort($result);
+
+		return $result;
+	}
+
 	private function ___getModels()
 	{
 		$result = [];
@@ -537,22 +553,23 @@ class LaravelCommands extends Command
 
 	private function seedExecuteOne()
 	{
-		$models = $this->___getModels();
-		$models[] = '-------------------------------------------------------';
-		$models[] = 'CANCEL';
+		$seeds = $this->___getSeeders();
 
-		$this->printLine('MODELS');
-		$this->printSingleArray($models);
+		$seeds[] = '-------------------------------------------------------';
+		$seeds[] = 'CANCEL';
 
-		$model = $this->anticipate('Choose Model [cancel]', $models);
+		$this->printLine('SEEDS');
+		$this->printSingleArray($seeds);
 
-		if ( ($model === 'CANCEL') || ($model === null) || ($model === '-------------------------------------------------------') )
+		$seed = $this->anticipate('Choose Seed [cancel]', $seeds);
+
+		if ( ($seed === 'CANCEL') || ($seed === null) || ($seed === '-------------------------------------------------------') )
 		{
 			$this->waitKey();
 			return $this->printSeedsMenu();
 		}
 
-		$command = sprintf('php artisan db:seed --class=%ssSeeder', $model);
+		$command = sprintf('php artisan db:seed --class=%s', $seed);
 		$this->info('COMMAND: ' . $command);
 		$execute = $this->confirm('EXECUTE SEED?', false);
 		if ($execute)
