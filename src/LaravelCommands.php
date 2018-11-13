@@ -353,7 +353,7 @@ class LaravelCommands extends Command
 				$command = sprintf('php artisan make:model %s%s -m', $folder_name, $model_name);
 				if ($this->confirm($command, 1))
 				{
-					$this->beginWindow('EXECUTING MODEL AND MIGRATE CREATION');
+					$this->beginWindow('EXECUTING MIGRATE AND MODEL CREATION');
 					system($command);
 					$this->endWindow();
 				}
