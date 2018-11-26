@@ -241,7 +241,7 @@ class LaravelCommands extends Command
 		[
 			'MIGRATE',
 			'SEEDS',
-			'COMPOSER',
+			'SYSTEM',
 			'DATABASE',
 			'X' => 'SAIR'
 		];
@@ -257,11 +257,11 @@ class LaravelCommands extends Command
 			case 'SEEDS':
 				$this->printSeedsMenu();
 			break;
-			case 'COMPOSER':
-				$this->printComposerMenu();
-			break;
 			case 'DATABASE':
 				$this->printDatabaseMenu();
+			break;
+			case 'SYSTEM':
+				$this->printSystemMenu();
 			break;
 		}
 	}
@@ -421,13 +421,21 @@ class LaravelCommands extends Command
 		}
 	}
 
-	private function printComposerMenu()
+	// ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗
+	// ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║
+	// ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║
+	// ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║
+	// ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║
+	// ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝
+
+	private function printSystemMenu()
 	{
 		$caption = 'COMPOSER COMMANDS';
 		$this->printLogo($caption);
 		$options = 
 		[
-			'DUMP AUTOLOAD',
+			'COMPOSER DUMP-AUTOLOAD',
+			'APACHE RELOAD',
 			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
@@ -438,11 +446,19 @@ class LaravelCommands extends Command
 			case 'VOLTAR':
 				return $this->printMainMenu();
 			break;
-			case 'DUMP AUTOLOAD':
+			case 'COMPOSER DUMP-AUTOLOAD':
 				$this->printLogo($caption, 'DUMP AUTOLOAD');
 				system('composer dumpautoload');
 				$this->waitKey();
-				return $this->printComposerMenu();
+				return $this->printSystemMenu();
+			break;
+			case 'APACHE RELOAD':
+				$this->printLogo($caption, 'APACHE RELOAD');
+				$this->info('Restarting Apache2...');
+				system('sudo systemctl restart apache2');
+				$this->info('Done');
+				$this->waitKey();
+				return $this->printSystemMenu();
 			break;
 		}
 	}
