@@ -1,6 +1,6 @@
 # Laravel Commands
 
-> Laravel Artisan Command Utilities v1.0.15
+> Laravel Artisan Command Utilities v1.0.16
 
 ## Screen
 
