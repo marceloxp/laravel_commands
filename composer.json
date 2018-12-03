@@ -3,7 +3,7 @@
     "description": "Laravel Artisan Commands Utilities",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "authors":
     [
         {
@@ -32,5 +32,8 @@
     "require-dev":
     {
         "ifsnop/mysqldump-php": "2.*"
+    },
+    "require": {
+        "orangehill/iseed": "dev-master"
     }
 }
