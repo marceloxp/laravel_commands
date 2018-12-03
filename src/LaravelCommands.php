@@ -43,9 +43,14 @@ class LaravelCommands extends Command
 		$this->printMainMenu();
 	}
 
+	private function isWindows()
+	{
+		return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+	}
+
 	private function clear()
 	{
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { $this->breakLine(5); } else { system('clear'); }
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { $this->breakLine(50); } else { system('clear'); }
 	}
 
 	private function printLogo($title = '', $subtitle = '')
@@ -77,7 +82,7 @@ class LaravelCommands extends Command
 		{
 			$text .= ' > ' . $subtitle; 
 		}
-		$this->printLine($subtitle, '', $laravel_version . ' == ' . $php_version);
+		$this->printLine($subtitle, '', $laravel_version . ' (' . strtoupper(PHP_OS) . ') == ' . $php_version);
 	}
 
 	private function __getSingleLine()
@@ -212,7 +217,9 @@ class LaravelCommands extends Command
 	private function waitKey()
 	{
 		$this->printLine();
-		readline('Press any key to continue.');
+		$this->info('= Press any key to continue.');
+		$this->printLine();
+		readline('');
 	}
 
 	private function beginWindow($p_title)
@@ -432,12 +439,13 @@ class LaravelCommands extends Command
 	{
 		$caption = 'COMPOSER COMMANDS';
 		$this->printLogo($caption);
-		$options = 
-		[
-			'COMPOSER DUMP-AUTOLOAD',
-			'APACHE RELOAD',
-			'<' => 'VOLTAR'
-		];
+		$options = [];
+		$options[] = 'COMPOSER DUMP-AUTOLOAD';
+		if (!$this->isWindows())
+		{
+			$options[] = 'APACHE RELOAD';
+		}
+		$options['<'] = 'VOLTAR';
 		$defaultIndex = '<';
 		$option = $this->choice($this->choice_text, $options, $defaultIndex);
 
