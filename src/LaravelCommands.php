@@ -553,7 +553,7 @@ class LaravelCommands extends Command
 			return $this->printSeedsMenu();
 		}
 
-		$command = sprintf('php artisan make:seed %ssSeeder', $model);
+		$command = sprintf('php artisan make:seed %ssTableSeeder', $model);
 		$this->info('COMMAND: ' . $command);
 		$execute = $this->confirm('CREATE SEED?', false);
 		if ($execute)
