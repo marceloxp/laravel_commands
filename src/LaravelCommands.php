@@ -5,6 +5,9 @@ namespace marceloxp\laravel_commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
+$libfile = dirname(__FILE__) . '/LaravelCommandsLib.php';
+include_once($libfile);
+
 class LaravelCommands extends Command
 {
 	/**
@@ -43,14 +46,36 @@ class LaravelCommands extends Command
 		$this->printMainMenu();
 	}
 
+	private function isLinux()
+	{
+		return (strtoupper(PHP_OS) === 'LINUX');
+	}
+
 	private function isWindows()
 	{
 		return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 	}
 
+	private function isWindowsNT()
+	{
+		return (strtoupper(PHP_OS) === 'WINNT');
+	}
+
 	private function clear()
 	{
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') { $this->breakLine(50); } else { system('clear'); }
+		$os = strtoupper(PHP_OS);
+		if
+		(
+			($os === 'WINNT') ||
+			($os === 'LINUX')
+		)
+		{
+			system('clear');
+		}
+		else
+		{
+			$this->breakLine(50);
+		}
 	}
 
 	private function printLogo($title = '', $subtitle = '')
@@ -441,7 +466,7 @@ class LaravelCommands extends Command
 		$this->printLogo($caption);
 		$options = [];
 		$options[] = 'COMPOSER DUMP-AUTOLOAD';
-		if (!$this->isWindows())
+		if ($this->isLinux())
 		{
 			$options[] = 'APACHE RELOAD';
 		}
