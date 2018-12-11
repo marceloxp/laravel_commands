@@ -63,12 +63,7 @@ class LaravelCommands extends Command
 
 	private function clear()
 	{
-		$os = strtoupper(PHP_OS);
-		if
-		(
-			($os === 'WINNT') ||
-			($os === 'LINUX')
-		)
+		if (!$this->isWindows())
 		{
 			system('clear');
 		}
