@@ -1,10 +1,10 @@
 # Laravel Commands
 
-> Laravel Artisan Command Utilities v1.0.18
+> Laravel Artisan Command Utilities v1.0.19
 
 ## Screen
 
-![Screen](https://raw.githubusercontent.com/marceloxp/laravel_commands/master/screen-v3.png "Screen")
+![Screen](https://raw.githubusercontent.com/marceloxp/laravel_commands/master/screen-v4.png "Screen")
 
 ## Install
 
@@ -23,11 +23,17 @@ php artisan xp
 ### Migrate
 
 - Status
-- Create Model
+- Create migration with model
 - Create custom migrate
 - Preview
 - Rollback
 - Execute migration
+- Drop all tables and migrate
+
+### Models
+
+- Simple foreign key
+- Rules generator
 
 ### Seeds
 
@@ -35,14 +41,15 @@ php artisan xp
 - Execute One
 - Execute All
 
-### Composer
+### System
 
-- Dump autoload
+- Composer Dump-Autoload
+- Apache reload (Linux)
 
 ### Database
 
 - Show config (from .env)
 - Show tables
 - Show fields from table
-- Rules generator
+- Show fields from table (csv)
 - Dump database
