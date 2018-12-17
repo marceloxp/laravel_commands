@@ -135,12 +135,17 @@ class LaravelCommands extends Command
 		}
 	}
 
-	private function printSingleArray($p_array, $columns = 1)
+	private function printSingleArray($p_array, $columns = 1, $p_print = true)
 	{
 		if ($columns == 1)
 		{
-			$this->info( implode(PHP_EOL, $p_array) );
-			return;
+			$result = implode(PHP_EOL, $p_array);
+			if ($p_print)
+			{
+				return $this->info($result);
+			}
+
+			return $result;
 		}
 
 		$pieces = array_chunk($p_array, ceil(count($p_array) / $columns));
@@ -311,6 +316,7 @@ class LaravelCommands extends Command
 		$options = 
 		[
 			'SIMPLE FOREIGN KEY',
+			'RULES GENERATOR',
 			'<' => 'VOLTAR'
 		];
 		$defaultIndex = '<';
@@ -324,6 +330,12 @@ class LaravelCommands extends Command
 			case 'SIMPLE FOREIGN KEY':
 				$this->printLogo($caption, 'SIMPLE FOREIGN KEY');
 				$this->simpleForeignKey();
+				$this->waitKey();
+				return $this->printModelMenu();
+			break;
+			case 'RULES GENERATOR':
+				$this->printLogo($caption, 'RULES GENERATOR');
+				$this->modelRulesGenerator();
 				$this->waitKey();
 				return $this->printModelMenu();
 			break;
@@ -425,6 +437,8 @@ class LaravelCommands extends Command
 		else
 		{
 			$this->info('Function "' . $config->detail->table . '()" already exists in ' . $config->master->model . '.');
+			$this->waitKey();
+			return printModelMenu();
 		}
 
 		// DETAIL
@@ -466,7 +480,134 @@ class LaravelCommands extends Command
 		else
 		{
 			$this->info('Function "' . $config->master->table . '()" already exists in ' . $config->detail->model . '.');
+			$this->waitKey();
+			return printModelMenu();
 		}
+	}
+
+	private function modelRulesGenerator()
+	{
+		$caption = 'MODEL COMMANDS';
+
+		$folder_model  = $this->ask('Folder name (ex: Models)', 'Models');
+		$folder_model  = (empty($folder_model)) ? 'Models' : $folder_model;
+		$folder_model .= '/';
+
+		$class_path_model = '\\App\\' . str_replace('/', '\\', $folder_model);
+
+		$models = $this->___getModels();
+		$models[] = '-------------------------------------------------------';
+		$models[] = 'CANCEL';
+
+		$this->printLine('MODELS');
+		$this->printSingleArray($models);
+
+		$model = $this->anticipate('Choose Model [cancel]', $models);
+		if ( ($model === 'CANCEL') || ($model === null) || ($model === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printModelMenu();
+		}
+
+		$table = str_plural(strtolower($model));
+		$fields = $this->__getFieldsMetadata($table);
+
+		$data = [];
+		foreach ($fields as $field)
+		{
+			$field_name        = $field['COLUMN_NAME'];
+			$field_length      = $field['CHARACTER_MAXIMUM_LENGTH'];
+			$field_required    = ($field['IS_NULLABLE'] == 'NO');
+			$field_enum        = (substr($field['COLUMN_TYPE'], 0, 4) == 'enum');
+			$data[$field_name] = [];
+
+			if ($field_enum)
+			{
+				preg_match("/^enum\(\'(.*)\'\)$/", $field['COLUMN_TYPE'], $matches);
+				$options = explode("','", $matches[1]);
+				$options = implode(',', $options);
+				$data[$field_name][] = sprintf('in:%s', $options);
+			}
+
+			if (!empty($field_required))
+			{
+				$data[$field_name][] = 'required';
+			}
+
+			if (!empty($field_length))
+			{
+				$data[$field_name][] = sprintf('max:%s', $field_length);
+			}
+		}
+
+		$max_length = $this->__getArrayKeyMaxLength($data);
+
+		$result = [];
+		reset($data);
+		foreach ($data as $field_name => $value)
+		{
+			if (!empty($value))
+			{
+				if ($field_name != 'id')
+				{
+					$result[] = sprintf("		'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
+				}
+			}
+		}
+
+		$this->printLogo($caption, 'RULES GENERATED - TABLE: ' . $table);
+		$this->breakLine();
+
+		$rules = $this->printSingleArray($result, 1, false);
+
+		$function_body = 
+		[
+			PHP_EOL,
+			"	public static function validate(\$request, \$id = '')",
+			"	{",
+			"		\$rules = ",
+			"		[",
+			"	" . $rules,
+			"		];",
+			"		return Role::_validate(\$request, \$rules, \$id);",
+			"	}",
+			"}",
+			PHP_EOL,
+		];
+
+		// MODEL FILE
+		$model_path  = app_path(sprintf('%s%s.php', $folder_model, $model));
+		$string_body = \File::get($model_path);
+		$model_body  = explode(PHP_EOL, $string_body);
+
+		$func       = new \ReflectionClass($class_path_model . $model);
+		$filename   = $func->getFileName();
+		$start_line = $func->getStartLine();
+		$end_line   = $func->getEndLine();
+		$length     = $end_line - $start_line;
+
+		if (strpos($string_body, 'validate(') === false)
+		{
+			$new_body = 
+			[
+				array_slice($model_body, 0, $end_line - 1),
+				$function_body,
+				array_slice($model_body, $end_line + 1)
+			];
+			$final_body = implode(PHP_EOL, $new_body[0]) . implode(PHP_EOL, $new_body[1]) . implode(PHP_EOL, $new_body[2]);
+
+			\File::put($model_path, $final_body);
+			$this->info(sprintf('File %s saved.', $model_path));
+		}
+		else
+		{
+			$this->info('Function "validate()" already exists in ' . $model . '.');
+			$this->waitKey();
+			return printModelMenu();
+		}
+
+		$this->waitKey();
+		return $this->printModelMenu();
 	}
 
 	// ███╗   ███╗██╗ ██████╗ ██████╗  █████╗ ████████╗███████╗
@@ -891,7 +1032,6 @@ class LaravelCommands extends Command
 			'SHOW TABLES',
 			'SHOW TABLE FIELDS',
 			'CSV TABLE FIELDS',
-			'RULES GENERATOR',
 			'DUMP DATABSE',
 			'<' => 'VOLTAR'
 		];
@@ -1000,118 +1140,6 @@ class LaravelCommands extends Command
 		$this->info($result);
 
 		$this->waitKey();
-	}
-
-	private function DatabaseRulesGenerator()
-	{
-		// 'campaign_id'          => 'required',
-		// 'name'                 => 'required|max:150',
-		// 'slug'                 => ['required', 'max:150', new UniqueProductCampaign()],
-		// 'description'          => 'max:150',
-		// 'dealers'              => 'required',
-		// 'title'                => 'max:150|required',
-		// 'price'                => 'max:150',
-		// 'conditions'           => 'max:512',
-		// 'features'             => 'max:512',
-		// 'color_title'          => 'max:64|required',
-		// 'color_price'          => 'max:64|required',
-		// 'color_conditions'     => 'max:64|required',
-		// 'color_features'       => 'max:64|required',
-		// 'legaltext'            => 'max:5000',
-		// 'modalinit_title'      => 'max:512|required',
-		// 'modalinit_subtitle'   => 'max:512|required',
-		// 'modalfooter'          => 'max:512|required',
-		// 'form_title'           => 'max:512|required',
-		// 'form_max_title'       => 'max:1024|required_without:form_max_description',
-		// 'form_max_description' => 'max:1024|required_without:form_max_title',
-		// 'mail_subject'         => 'max:128|required',
-		// 'mail_sender'          => 'max:128',
-		// 'mail_text'            => 'max:512|required',
-		// 'mail_url'             => 'max:512',
-		// 'voucher_title'        => 'max:512|required',
-		// 'voucher_subtitle'     => 'max:512',
-		// 'voucher_legal'        => 'max:5000|required',
-		// 'voucher_exit'         => 'max:512|required',
-		// 'posform_title'        => 'max:512|required',
-		// 'posform_subtitle'     => 'max:512|required',
-		// 'active'               => 'in:Sim,Não|required'
-
-		$caption = 'DATABASE COMMANDS';
-
-		$this->printLogo($caption, 'RULES GENERATOR');
-
-		$tables_options = $this->printTables();
-		if (empty($tables_options))
-		{
-			$this->info('No tables found.');
-			$this->waitKey();
-			return $this->printDatabaseMenu();
-		}
-		$table  = $this->anticipate('Table', $tables_options);
-		$fields = $this->__getFieldsMetadata($table);
-
-		$data = [];
-		foreach ($fields as $field)
-		{
-			$field_name        = $field['COLUMN_NAME'];
-			$field_length      = $field['CHARACTER_MAXIMUM_LENGTH'];
-			$field_required    = ($field['IS_NULLABLE'] == 'NO');
-			$field_enum        = (substr($field['COLUMN_TYPE'], 0, 4) == 'enum');
-			$data[$field_name] = [];
-
-			if ($field_enum)
-			{
-				preg_match("/^enum\(\'(.*)\'\)$/", $field['COLUMN_TYPE'], $matches);
-				$options = explode("','", $matches[1]);
-				$options = implode(',', $options);
-				$data[$field_name][] = sprintf('in:%s', $options);
-			}
-
-			if (!empty($field_required))
-			{
-				$data[$field_name][] = 'required';
-			}
-
-			if (!empty($field_length))
-			{
-				$data[$field_name][] = sprintf('max:%s', $field_length);
-			}
-		}
-
-		$max_length = $this->__getArrayKeyMaxLength($data);
-
-		$result = [];
-		reset($data);
-		foreach ($data as $field_name => $value)
-		{
-			if (!empty($value))
-			{
-				if ($field_name != 'id')
-				{
-					$result[] = sprintf("		'%s'%s=> '%s',", $field_name, str_pad('', ($max_length + 1 - strlen($field_name) )), implode('|', $value));
-				}
-			}
-		}
-
-		$this->printLogo($caption, 'RULES GENERATED - TABLE: ' . $table);
-		$this->breakLine();
-
-		$this->info(
-		"
-public static function validate(\$request, \$id = '')
-{
-	\$rules = 
-	[");
-		$this->printSingleArray($result);
-		$this->info("	];
-	return Role::_validate(\$request, \$rules, \$id);
-}
-		");
-
-		$this->breakLine();
-
-		$this->waitKey();
-		return $this->printDatabaseMenu();
 	}
 
 	private function DatabaseDump()
