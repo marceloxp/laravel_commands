@@ -268,6 +268,7 @@ class LaravelCommands extends Command
 		[
 			'MIGRATE',
 			'SEEDS',
+			'MODELS',
 			'SYSTEM',
 			'DATABASE',
 			'X' => 'SAIR'
@@ -281,6 +282,9 @@ class LaravelCommands extends Command
 			case 'MIGRATE':
 				$this->printMigrateMenu();
 			break;
+			case 'MODELS':
+				$this->printModelMenu();
+			break;
 			case 'SEEDS':
 				$this->printSeedsMenu();
 			break;
@@ -290,6 +294,178 @@ class LaravelCommands extends Command
 			case 'SYSTEM':
 				$this->printSystemMenu();
 			break;
+		}
+	}
+
+	// ███╗   ███╗ ██████╗ ██████╗ ███████╗██╗     ███████╗
+	// ████╗ ████║██╔═══██╗██╔══██╗██╔════╝██║     ██╔════╝
+	// ██╔████╔██║██║   ██║██║  ██║█████╗  ██║     ███████╗
+	// ██║╚██╔╝██║██║   ██║██║  ██║██╔══╝  ██║     ╚════██║
+	// ██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗███████╗███████║
+	// ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝
+
+	private function printModelMenu()
+	{
+		$caption = 'MODEL COMMANDS';
+		$this->printLogo($caption);
+		$options = 
+		[
+			'SIMPLE FOREIGN KEY',
+			'<' => 'VOLTAR'
+		];
+		$defaultIndex = '<';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
+
+		switch ($options[$option])
+		{
+			case 'VOLTAR':
+				return $this->printMainMenu();
+			break;
+			case 'SIMPLE FOREIGN KEY':
+				$this->printLogo($caption, 'SIMPLE FOREIGN KEY');
+				$this->simpleForeignKey();
+				$this->waitKey();
+				return $this->printModelMenu();
+			break;
+		}
+	}
+
+	private function simpleForeignKey()
+	{
+		$folder_model  = $this->ask('Folder name (ex: Models)', 'Models');
+		$folder_model  = (empty($folder_model)) ? 'Models' : $folder_model;
+		$folder_model .= '/';
+
+		$class_path_model = '\\App\\' . str_replace('/', '\\', $folder_model);
+
+		$models = $this->___getModels();
+		$models[] = '-------------------------------------------------------';
+		$models[] = 'CANCEL';
+
+		$this->printLine('MODELS');
+		$this->printSingleArray($models);
+
+		$model1 = $this->anticipate('Choose Model 1 [cancel]', $models);
+		if ( ($model1 === 'CANCEL') || ($model1 === null) || ($model1 === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printModelMenu();
+		}
+
+		$model2 = $this->anticipate('Choose Model 2 [cancel]', $models);
+		if ( ($model2 === 'CANCEL') || ($model2 === null) || ($model2 === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printModelMenu();
+		}
+
+		$table1 = str_plural(strtolower($model1));
+		$table2 = str_plural(strtolower($model2));
+
+		$index1 = strtolower($model1) . '_id';
+		$index2 = strtolower($model2) . '_id';
+
+		$fields1 = $this->__getFieldNames($table1);
+		$fields2 = $this->__getFieldNames($table2);
+
+		if (in_array($index1, $fields2))
+		{
+			$config = (Object)
+			[
+				'master' => (Object) ['model' => $model1, 'table' => $table1],
+				'detail' => (Object) ['model' => $model2, 'table' => $table2],
+				'field'  => $index1
+			];
+		}
+		else
+		{
+			$config = (Object)
+			[
+				'master' => (Object) ['model' => $model2, 'table' => $table2],
+				'detail' => (Object) ['model' => $model1, 'table' => $table1],
+				'field'  => $index2
+			];
+		}
+
+		// MASTER
+		$master_path = app_path(sprintf('%s%s.php', $folder_model, $config->master->model));
+		$string_body = \File::get($master_path);
+		$master_body = explode(PHP_EOL, $string_body);
+
+		$func       = new \ReflectionClass($class_path_model . $config->master->model);
+		$filename   = $func->getFileName();
+		$start_line = $func->getStartLine();
+		$end_line   = $func->getEndLine();
+		$length     = $end_line - $start_line;
+
+		if (strpos($string_body, $config->detail->table . '(') === false)
+		{
+			$detail_body = 
+			[
+				PHP_EOL,
+				'	public function ' . $config->detail->table . '()',
+				'	{',
+				'		return $this->hasMany(' . $class_path_model . $config->detail->model . '::class);',
+				'	}',
+				'}',
+				PHP_EOL,
+			];
+
+			$new_body = 
+			[
+				array_slice($master_body, 0, $end_line - 1),
+				$detail_body,
+				array_slice($master_body, $end_line + 1)
+			];
+			$final_body = implode(PHP_EOL, $new_body[0]) . implode(PHP_EOL, $new_body[1]) . implode(PHP_EOL, $new_body[2]);
+
+			\File::put($master_path, $final_body);
+			$this->info(sprintf('File %s saved.', $master_path));
+		}
+		else
+		{
+			$this->info('Function "' . $config->detail->table . '()" already exists in ' . $config->master->model . '.');
+		}
+
+		// DETAIL
+		$detail_path = app_path(sprintf('%s%s.php', $folder_model, $config->detail->model));
+		$string_body = \File::get($detail_path);
+		$detail_body = explode(PHP_EOL, $string_body);
+
+		$func       = new \ReflectionClass($class_path_model . $config->detail->model);
+		$filename   = $func->getFileName();
+		$start_line = $func->getStartLine();
+		$end_line   = $func->getEndLine();
+		$length     = $end_line - $start_line;
+
+		if (strpos($string_body, $config->master->table . '(') === false)
+		{
+			$master_body = 
+			[
+				PHP_EOL,
+				'	public function ' . $config->master->table . '()',
+				'	{',
+				'		return $this->belongsTo(' . $class_path_model . $config->master->model . '::class);',
+				'	}',
+				'}',
+				PHP_EOL,
+			];
+
+			$new_body = 
+			[
+				array_slice($detail_body, 0, $end_line - 1),
+				$master_body,
+				array_slice($detail_body, $end_line + 1)
+			];
+			$final_body = implode(PHP_EOL, $new_body[0]) . implode(PHP_EOL, $new_body[1]) . implode(PHP_EOL, $new_body[2]);
+
+			\File::put($detail_path, $final_body);
+
+			$this->info(sprintf('File %s saved.', $detail_path));
+		}
+		else
+		{
+			$this->info('Function "' . $config->master->table . '()" already exists in ' . $config->detail->model . '.');
 		}
 	}
 
