@@ -1031,6 +1031,7 @@ class LaravelCommands extends Command
 			'SHOW CONFIG',
 			'SHOW TABLES',
 			'SHOW TABLE FIELDS',
+			'DESCRIBE TABLE',
 			'CSV TABLE FIELDS',
 			'DUMP DATABSE',
 			'<' => 'VOLTAR'
@@ -1081,6 +1082,11 @@ class LaravelCommands extends Command
 				$this->showTableFields();
 				return $this->printDatabaseMenu();
 			break;
+			case 'DESCRIBE TABLE':
+				$this->printLogo($caption, 'DESCRIBE TABLE');
+				$this->describeTable();
+				return $this->printDatabaseMenu();
+			break;
 			case 'CSV TABLE FIELDS':
 				$this->printLogo($caption, 'CSV TABLE FIELDS');
 				$this->csvTableFields();
@@ -1118,6 +1124,28 @@ class LaravelCommands extends Command
 		{
 			$this->printSingleArray($fields);
 		}
+
+		$this->waitKey();
+	}
+
+	private function describeTable()
+	{
+		$tables_options = $this->printTables();
+		if (empty($tables_options))
+		{
+			$this->info('No tables found.');
+			$this->waitKey();
+			return false;
+		}
+		$table = $this->anticipate('Table', $tables_options);
+
+		$result = \DB::select(sprintf('DESCRIBE %s%s;', env('DB_TABLE_PREFIX'), $table));
+		$result = collect($result)->map(function ($item, $key) { return collect($item)->toArray(); });
+		// var_dump($result->toArray());
+		// echo PHP_EOL;
+		$result = arrayToFixedTable($result->toArray());
+		echo $result;
+		echo PHP_EOL;
 
 		$this->waitKey();
 	}
