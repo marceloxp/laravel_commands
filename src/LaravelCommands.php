@@ -2,6 +2,7 @@
 
 namespace marceloxp\laravel_commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -188,16 +189,12 @@ class LaravelCommands extends Command
 	private function __getTables()
 	{
 		$tables_in_db = \DB::select('SHOW TABLES');
-		$db = sprintf('Tables_in_%s', env('DB_DATABASE'));
-		$table_prefix = env('DB_TABLE_PREFIX');
-		$tables = [];
-		foreach($tables_in_db as $table)
-		{
-			$table_name = str_replace($table_prefix, '', $table->{$db});
-			$tables[] = $table_name;
-		}
-
-		return $tables;
+		$tables = collect($tables_in_db);
+		$prefix = env('DB_TABLE_PREFIX');
+		$tables = $tables->map(function ($item, $key) { return collect($item)->values()->first(); });
+		$tables = $tables->filter(function ($value, $key) use ($prefix) { return Str::startsWith($value, $prefix); });
+		$tables = $tables->map(function ($item, $key) use ($prefix) { return substr($item, strlen($prefix)); });
+		return $tables->toArray();
 	}
 
 	private function printSingleLine()
@@ -1032,6 +1029,7 @@ class LaravelCommands extends Command
 			'SHOW TABLES',
 			'SHOW TABLE FIELDS',
 			'DESCRIBE TABLE',
+			'SHOW CREATE TABLE',
 			'CSV TABLE FIELDS',
 			'DUMP DATABSE',
 			'<' => 'VOLTAR'
@@ -1085,6 +1083,11 @@ class LaravelCommands extends Command
 			case 'DESCRIBE TABLE':
 				$this->printLogo($caption, 'DESCRIBE TABLE');
 				$this->describeTable();
+				return $this->printDatabaseMenu();
+			break;
+			case 'SHOW CREATE TABLE':
+				$this->printLogo($caption, 'SHOW CREATE TABLE');
+				$this->showCreateTable();
 				return $this->printDatabaseMenu();
 			break;
 			case 'CSV TABLE FIELDS':
@@ -1141,12 +1144,27 @@ class LaravelCommands extends Command
 
 		$result = \DB::select(sprintf('DESCRIBE %s%s;', env('DB_TABLE_PREFIX'), $table));
 		$result = collect($result)->map(function ($item, $key) { return collect($item)->toArray(); });
-		// var_dump($result->toArray());
-		// echo PHP_EOL;
-		$result = arrayToFixedTable($result->toArray());
+		$result = $result->toArray();
+		$this->table(array_keys($result[0]), $result);
+		echo PHP_EOL;
+		$this->waitKey();
+	}
+
+	private function showCreateTable()
+	{
+		$tables_options = $this->printTables();
+		if (empty($tables_options))
+		{
+			$this->info('No tables found.');
+			$this->waitKey();
+			return false;
+		}
+		$table = $this->anticipate('Table', $tables_options);
+
+		$result = \DB::select(sprintf('SHOW CREATE TABLE %s%s;', env('DB_TABLE_PREFIX'), $table));
+		$result = collect(collect($result)->first())->get('Create Table');
 		echo $result;
 		echo PHP_EOL;
-
 		$this->waitKey();
 	}
 
