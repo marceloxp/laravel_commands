@@ -3,7 +3,7 @@
     "description": "Laravel Artisan Commands Utilities",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.18",
+    "version": "1.0.21",
     "authors":
     [
         {

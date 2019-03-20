@@ -136,11 +136,36 @@ class LaravelCommands extends Command
 		}
 	}
 
-	private function printSingleArray($p_array, $columns = 1, $p_print = true)
+	private function printSingleArray(&$p_array, $columns = 1, $p_print = true, $p_add_index = false)
 	{
 		if ($columns == 1)
 		{
-			$result = implode(PHP_EOL, $p_array);
+			if (!$p_add_index)
+			{
+				$result = implode(PHP_EOL, $p_array);
+			}
+			else
+			{
+				$array_lenght = count($p_array);
+				$str_length = strlen($array_lenght);
+				$result = collect($p_array)->transform
+				(
+					function($item, $key) use ($str_length)
+					{
+						return sprintf('%s - %s', str_pad(($key + 1), $str_length, ' ', STR_PAD_LEFT), $item);
+					}
+				)->toArray();
+				$result = implode(PHP_EOL, $result);
+
+				if ($p_add_index)
+				{
+					foreach ($p_array as $key => $value)
+					{
+						$p_array[$key] = sprintf('%s - %s', str_pad(($key + 1), $str_length, ' ', STR_PAD_LEFT), $value);
+					}
+				}
+			}
+
 			if ($p_print)
 			{
 				return $this->info($result);
@@ -600,7 +625,7 @@ class LaravelCommands extends Command
 		{
 			$this->info('Function "validate()" already exists in ' . $model . '.');
 			$this->waitKey();
-			return printModelMenu();
+			return $this->printModelMenu();
 		}
 
 		$this->waitKey();
@@ -758,6 +783,53 @@ class LaravelCommands extends Command
 
 				$this->waitKey();
 				return $this->printMigrateMenu();
+			break;
+		}
+	}
+
+	private function ___getMigrations()
+	{
+		$result = [];
+		$path = base_path('database/migrations');
+		$files = File::allFiles($path);
+		foreach ($files as $file)
+		{
+			$filename = $file->getBasename();
+			$path_parts = pathinfo($filename);
+			$result[] = $path_parts['filename'];
+		}
+		sort($result);
+
+		return $result;
+	}
+
+	//  ██████╗ █████╗  ██████╗██╗  ██╗███████╗
+	// ██╔════╝██╔══██╗██╔════╝██║  ██║██╔════╝
+	// ██║     ███████║██║     ███████║█████╗  
+	// ██║     ██╔══██║██║     ██╔══██║██╔══╝  
+	// ╚██████╗██║  ██║╚██████╗██║  ██║███████╗
+	//  ╚═════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝
+
+	private function printCacheMenu()
+	{
+		$caption = 'CACHE COMMANDS';
+		$this->printLogo($caption);
+		$options = [];
+		$options[] = 'CLEAR';
+		$options['<'] = 'VOLTAR';
+		$defaultIndex = '<';
+		$option = $this->choice($this->choice_text, $options, $defaultIndex);
+
+		switch ($options[$option])
+		{
+			case 'VOLTAR':
+				return $this->printMainMenu();
+			break;
+			case 'CLEAR':
+				$this->printLogo($caption, 'CACHE CLEAR');
+				system('php artisan cache:clear');
+				$this->waitKey();
+				return $this->printSystemMenu();
 			break;
 		}
 	}
