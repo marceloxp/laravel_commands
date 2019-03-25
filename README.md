@@ -18,6 +18,25 @@ composer require marceloxp/laravel_commands
 php artisan xp
 ```
 
+## Local dev test
+
+`package.json`
+
+```json
+    "repositories":
+    {
+        "dev-package":
+        {
+            "type": "path",
+            "url": "~/git/laravel_commands",
+            "options":
+            {
+                "symlink": true
+            }
+        }
+    },
+```
+
 ## Commands
 
 ### Migrate
