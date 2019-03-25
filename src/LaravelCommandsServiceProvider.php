@@ -15,7 +15,8 @@ class LaravelCommandsServiceProvider extends ServiceProvider
 	{
 		if ($this->app->runningInConsole()) {
 			$this->commands([
-				LaravelCommands::class
+				LaravelCommands::class,
+				ModelFkOneToOne::class
 			]);
 		}
 	}
