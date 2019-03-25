@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\File;
 $libfile = dirname(__FILE__) . '/LaravelCommandsLib.php';
 include_once($libfile);
 
-class LaravelCommands extends Command
+class LaravelCommands extends LaravelCommandsBase
 {
 	/**
 	 * The name and signature of the console command.
@@ -45,240 +45,6 @@ class LaravelCommands extends Command
 	public function handle()
 	{
 		$this->printMainMenu();
-	}
-
-	private function isLinux()
-	{
-		return (strtoupper(PHP_OS) === 'LINUX');
-	}
-
-	private function isWindows()
-	{
-		return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
-	}
-
-	private function isWindowsNT()
-	{
-		return (strtoupper(PHP_OS) === 'WINNT');
-	}
-
-	private function clear()
-	{
-		if (!$this->isWindows())
-		{
-			system('clear');
-		}
-		else
-		{
-			$this->breakLine(50);
-		}
-	}
-
-	private function printLogo($title = '', $subtitle = '')
-	{
-		global $app;
-
-		$php_version = PHP_VERSION;
-		$php_version = explode('-', $php_version);
-		$php_version = array_shift($php_version);
-		$php_version = 'PHP v' . $php_version;
-
-		$app_name        = mb_strtoupper(config('app.name'));
-		$app_env         = sprintf('env [%s]', env('APP_ENV'));
-		$laravel_version = sprintf('Laravel %s', $app->version());
-
-		$this->clear();
-		$this->printLine($title, $app_name, $app_env);
-		$this->info
-("	    __                                __   ______                                          __    
-	   / /   ____ __________ __   _____  / /  / ____/___  ____ ___  ____ ___  ____ _____  ____/ /____
-	  / /   / __ `/ ___/ __ `/ | / / _ \/ /  / /   / __ \/ __ `__ \/ __ `__ \/ __ `/ __ \/ __  / ___/
-	 / /___/ /_/ / /  / /_/ /| |/ /  __/ /  / /___/ /_/ / / / / / / / / / / / /_/ / / / / /_/ (__  ) 
-	/_____/\__,_/_/   \__,_/ |___/\___/_/   \____/\____/_/ /_/ /_/_/ /_/ /_/\__,_/_/ /_/\__,_/____/  
-"
-		);
-
-		$text = $title;
-		if (!empty($subtitle))
-		{
-			$text .= ' > ' . $subtitle; 
-		}
-		$this->printLine($subtitle, '', $laravel_version . ' (' . strtoupper(PHP_OS) . ') == ' . $php_version);
-	}
-
-	private function __getSingleLine()
-	{
-		return '-------------------------------------------------------------------------------------------------------------------';
-	}
-
-	private function __getLine()
-	{
-		return '===================================================================================================================';
-	}
-
-	private function __getArrayKeyMaxLength($p_array)
-	{
-		$keys    = array_keys($p_array);
-		$lengths = array_map('strlen', $keys);
-		return max($lengths);
-	}
-
-	private function printAssocArrayToList($p_array)
-	{
-		$keys       = array_keys($p_array);
-		$lengths    = array_map('strlen', $keys);
-		$max_length = max($lengths) + 3;
-
-		foreach ($p_array as $key => $value)
-		{
-			$line = sprintf('%s%s', str_pad($key.' ', $max_length, '.'), $value);
-			$this->info($line);
-		}
-	}
-
-	private function printSingleArray(&$p_array, $columns = 1, $p_print = true, $p_add_index = false)
-	{
-		if ($columns == 1)
-		{
-			if (!$p_add_index)
-			{
-				$result = implode(PHP_EOL, $p_array);
-			}
-			else
-			{
-				$array_lenght = count($p_array);
-				$str_length = strlen($array_lenght);
-				$result = collect($p_array)->transform
-				(
-					function($item, $key) use ($str_length)
-					{
-						return sprintf('%s - %s', str_pad(($key + 1), $str_length, ' ', STR_PAD_LEFT), $item);
-					}
-				)->toArray();
-				$result = implode(PHP_EOL, $result);
-
-				if ($p_add_index)
-				{
-					foreach ($p_array as $key => $value)
-					{
-						$p_array[$key] = sprintf('%s - %s', str_pad(($key + 1), $str_length, ' ', STR_PAD_LEFT), $value);
-					}
-				}
-			}
-
-			if ($p_print)
-			{
-				return $this->info($result);
-			}
-
-			return $result;
-		}
-
-		$pieces = array_chunk($p_array, ceil(count($p_array) / $columns));
-
-		$maxlengths = [];
-		foreach ($pieces as $column)
-		{
-			$lengths = array_map('strlen', $column);
-			$max_length = max($lengths);
-			$maxlengths[] = $max_length;
-		}
-
-		reset($pieces);
-		foreach ($pieces as $index => $piece)
-		{
-			foreach ($piece as $key => $value)
-			{
-				$pieces[$index][$key] = str_pad($pieces[$index][$key], ($maxlengths[$index] + 3), ' ');
-			}
-		}
-		
-		$k = 0;
-		$result = array_shift($pieces);
-		while (count($pieces) > 0)
-		{
-			$temp = array_shift($pieces);
-			foreach ($temp as $key => $value)
-			{
-				$result[$key] .= $value;
-			}
-			if ($k > 100)
-			{
-				die('Stack overflow!');
-			}
-		}
-
-		$this->printSingleArray($result);
-	}
-
-	private function __getTables()
-	{
-		$tables_in_db = \DB::select('SHOW TABLES');
-		$tables = collect($tables_in_db);
-		$prefix = env('DB_TABLE_PREFIX');
-		$tables = $tables->map(function ($item, $key) { return collect($item)->values()->first(); });
-		$tables = $tables->filter(function ($value, $key) use ($prefix) { return Str::startsWith($value, $prefix); });
-		$tables = $tables->map(function ($item, $key) use ($prefix) { return substr($item, strlen($prefix)); });
-		return $tables->toArray();
-	}
-
-	private function printSingleLine()
-	{
-		$this->info($this->__getSingleLine());
-	}
-
-	private function printLine($left = '', $center = '', $right = '')
-	{
-		$line = $this->__getLine();
-		$lcount = strlen($line);
-
-		if (!empty($left))
-		{
-			$left = ' ' . $left . ' ';
-			$line = substr_replace($line, $left, 2, strlen($left));
-		}
-
-		if (!empty($center))
-		{
-			$center = ' ' . $center . ' ';
-			$line = substr_replace($line, $center, ceil($lcount / 2)-(strlen($center) / 2), strlen($center));
-		}
-
-		if (!empty($right))
-		{
-			$right = ' ' . $right . ' ';
-			$line = substr_replace($line, $right, $lcount-strlen($right)-2, strlen($right));
-		}
-
-		$this->info($line);
-	}
-
-	private function breakLine($p_lines = 1)
-	{
-		for($k = 0; $k < $p_lines; $k++)
-		{
-			$this->info('');
-		}
-	}
-
-	private function waitKey()
-	{
-		$this->printLine();
-		$this->info('= Press any key to continue.');
-		$this->printLine();
-		readline('');
-	}
-
-	private function beginWindow($p_title)
-	{
-		$this->printLine();
-		$this->info($p_title);
-		$this->printLine();
-	}
-
-	private function endWindow()
-	{
-		$this->printLine();
 	}
 
 	// ███╗   ███╗ █████╗ ██╗███╗   ██╗    ███╗   ███╗███████╗███╗   ██╗██╗   ██╗
@@ -373,12 +139,6 @@ class LaravelCommands extends Command
 
 	private function oneToOneForeignKey()
 	{
-		$folder_model  = 'Models';
-		$folder_model  = (empty($folder_model)) ? 'Models' : $folder_model;
-		$folder_model .= '/';
-
-		$class_path_model = '\\App\\' . str_replace('/', '\\', $folder_model);
-
 		$models = $this->___getModels();
 		$models[] = '-------------------------------------------------------';
 		$models[] = 'CANCEL';
@@ -400,50 +160,11 @@ class LaravelCommands extends Command
 			return $this->printModelMenu();
 		}
 
-		$list_function_name = strtolower($model_list);
-		$list_model_path = 
-
-		// MASTER
-		$master_path = app_path(sprintf('%s%s.php', $folder_model, $model_target));
-		$string_body = \File::get($master_path);
-		$master_body = explode(PHP_EOL, $string_body);
-
-		$func       = new \ReflectionClass($class_path_model . $model_target);
-		$filename   = $func->getFileName();
-		$start_line = $func->getStartLine();
-		$end_line   = $func->getEndLine();
-		$length     = $end_line - $start_line;
-
-		if (strpos($string_body, $list_function_name . '(') === false)
-		{
-			$detail_body = 
-			[
-				PHP_EOL,
-				'	public function ' . $list_function_name . '()',
-				'	{',
-				'		return $this->hasOne(' . $class_path_model . $model_list . '::class, \'id\'1);',
-				'	}',
-				'}',
-				PHP_EOL,
-			];
-
-			$new_body = 
-			[
-				array_slice($master_body, 0, $end_line - 1),
-				$detail_body,
-				array_slice($master_body, $end_line + 1)
-			];
-			$final_body = implode(PHP_EOL, $new_body[0]) . implode(PHP_EOL, $new_body[1]) . implode(PHP_EOL, $new_body[2]);
-
-			\File::put($master_path, $final_body);
-			$this->info(sprintf('File %s saved.', $master_path));
-		}
-		else
-		{
-			$this->info('Function "' . $list_function_name . '()" already exists in ' . $model_target . '.');
-			$this->waitKey();
-			return $this->printModelMenu();
-		}
+		$this->call
+		(
+			'xp:model_fk_one_to_one',
+			compact('model_target','model_list')
+		);
 		
 		$this->waitKey();
 		return $this->printModelMenu();
@@ -872,22 +593,6 @@ class LaravelCommands extends Command
 		}
 	}
 
-	private function ___getMigrations()
-	{
-		$result = [];
-		$path = base_path('database/migrations');
-		$files = File::allFiles($path);
-		foreach ($files as $file)
-		{
-			$filename = $file->getBasename();
-			$path_parts = pathinfo($filename);
-			$result[] = $path_parts['filename'];
-		}
-		sort($result);
-
-		return $result;
-	}
-
 	//  ██████╗ █████╗  ██████╗██╗  ██╗███████╗
 	// ██╔════╝██╔══██╗██╔════╝██║  ██║██╔════╝
 	// ██║     ███████║██║     ███████║█████╗  
@@ -1003,38 +708,6 @@ class LaravelCommands extends Command
 		}
 	}
 
-	private function ___getSeeders()
-	{
-		$result = [];
-		$path = base_path('database/seeds');
-		$files = File::allFiles($path);
-		foreach ($files as $file)
-		{
-			$filename = $file->getBasename();
-			$path_parts = pathinfo($filename);
-			$result[] = $path_parts['filename'];
-		}
-		sort($result);
-
-		return $result;
-	}
-
-	private function ___getModels()
-	{
-		$result = [];
-		$path = app_path('Models');
-		$files = File::allFiles($path);
-		foreach ($files as $file)
-		{
-			$filename = $file->getPathname();
-			$path_parts = pathinfo($filename);
-			$result[] = $path_parts['filename'];
-		}
-		sort($result);
-
-		return $result;
-	}
-
 	private function seedsCreate()
 	{
 		$models = $this->___getModels();
@@ -1120,61 +793,6 @@ class LaravelCommands extends Command
 	// ██║  ██║██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██║╚════██║██╔══╝  
 	// ██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗
 	// ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-
-	private function __getFieldsMetadata($p_table)
-	{
-		$query = sprintf
-		(
-			'SELECT * FROM `information_schema`.`COLUMNS` WHERE `table_schema` = "%s" AND table_name = "%s%s"',
-			env('DB_DATABASE'),
-			env('DB_TABLE_PREFIX'),
-			$p_table
-		);
-		$result = \DB::select($query);
-		$result = collect($result)->map(function($x){ return (array) $x; })->toArray();
-
-		return $result;
-	}
-
-	private function __getFieldNames($p_table, $p_add_comments = false)
-	{
-		$fields = $this->__getFieldsMetadata($p_table);
-		if (empty($fields))
-		{
-			return null;
-		}
-		$result = [];
-		foreach ($fields as $field)
-		{
-			if ($p_add_comments)
-			{
-				$result[$field['COLUMN_NAME']] = $field['COLUMN_COMMENT'];
-			}
-			else
-			{
-				$result[] = $field['COLUMN_NAME'];
-			}
-		}
-
-		return $result;
-	}
-
-	private function printTables()
-	{
-		$tables = $this->__getTables();
-		if (empty($tables))
-		{
-			return $tables;
-		}
-		sort($tables);
-		$tables_options = array_merge($tables);
-		usort($tables_options,function ($a,$b) { return strlen($a) - strlen($b); });
-		$this->breakLine();
-		$this->printLine('TABLES');
-		$this->printSingleArray($tables, 3);
-		$this->printLine();
-		return $tables_options;
-	}
 
 	private function printDatabaseMenu()
 	{
