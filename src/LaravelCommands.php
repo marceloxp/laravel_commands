@@ -337,7 +337,8 @@ class LaravelCommands extends Command
 		$this->printLogo($caption);
 		$options = 
 		[
-			'SIMPLE FOREIGN KEY',
+			'FOREIGN KEY -> ONE TO MANY',
+			'FOREIGN KEY -> ONE TO ONE',
 			'RULES GENERATOR',
 			'<' => 'VOLTAR'
 		];
@@ -349,9 +350,15 @@ class LaravelCommands extends Command
 			case 'VOLTAR':
 				return $this->printMainMenu();
 			break;
-			case 'SIMPLE FOREIGN KEY':
-				$this->printLogo($caption, 'SIMPLE FOREIGN KEY');
-				$this->simpleForeignKey();
+			case 'FOREIGN KEY -> ONE TO MANY':
+				$this->printLogo($caption, 'FOREIGN KEY -> ONE TO MANY');
+				$this->oneToManyForeignKey();
+				$this->waitKey();
+				return $this->printModelMenu();
+			break;
+			case 'FOREIGN KEY -> ONE TO ONE':
+				$this->printLogo($caption, 'FOREIGN KEY -> ONE TO ONE');
+				$this->oneToOneForeignKey();
 				$this->waitKey();
 				return $this->printModelMenu();
 			break;
@@ -364,7 +371,85 @@ class LaravelCommands extends Command
 		}
 	}
 
-	private function simpleForeignKey()
+	private function oneToOneForeignKey()
+	{
+		$folder_model  = 'Models';
+		$folder_model  = (empty($folder_model)) ? 'Models' : $folder_model;
+		$folder_model .= '/';
+
+		$class_path_model = '\\App\\' . str_replace('/', '\\', $folder_model);
+
+		$models = $this->___getModels();
+		$models[] = '-------------------------------------------------------';
+		$models[] = 'CANCEL';
+
+		$this->printLine('MODELS');
+		$this->printSingleArray($models);
+
+		$model_target = $this->anticipate('Choose Model Target (Ex: Post) [cancel]', $models);
+		if ( ($model_target === 'CANCEL') || ($model_target === null) || ($model_target === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printModelMenu();
+		}
+
+		$model_list = $this->anticipate('Choose Model List (Ex: Category) [cancel]', $models);
+		if ( ($model_list === 'CANCEL') || ($model_list === null) || ($model_list === '-------------------------------------------------------') )
+		{
+			$this->waitKey();
+			return $this->printModelMenu();
+		}
+
+		$list_function_name = strtolower($model_list);
+		$list_model_path = 
+
+		// MASTER
+		$master_path = app_path(sprintf('%s%s.php', $folder_model, $model_target));
+		$string_body = \File::get($master_path);
+		$master_body = explode(PHP_EOL, $string_body);
+
+		$func       = new \ReflectionClass($class_path_model . $model_target);
+		$filename   = $func->getFileName();
+		$start_line = $func->getStartLine();
+		$end_line   = $func->getEndLine();
+		$length     = $end_line - $start_line;
+
+		if (strpos($string_body, $list_function_name . '(') === false)
+		{
+			$detail_body = 
+			[
+				PHP_EOL,
+				'	public function ' . $list_function_name . '()',
+				'	{',
+				'		return $this->hasOne(' . $class_path_model . $model_list . '::class, \'id\'1);',
+				'	}',
+				'}',
+				PHP_EOL,
+			];
+
+			$new_body = 
+			[
+				array_slice($master_body, 0, $end_line - 1),
+				$detail_body,
+				array_slice($master_body, $end_line + 1)
+			];
+			$final_body = implode(PHP_EOL, $new_body[0]) . implode(PHP_EOL, $new_body[1]) . implode(PHP_EOL, $new_body[2]);
+
+			\File::put($master_path, $final_body);
+			$this->info(sprintf('File %s saved.', $master_path));
+		}
+		else
+		{
+			$this->info('Function "' . $list_function_name . '()" already exists in ' . $model_target . '.');
+			$this->waitKey();
+			return $this->printModelMenu();
+		}
+		
+		$this->waitKey();
+		return $this->printModelMenu();
+	}
+
+	private function oneToManyForeignKey()
 	{
 		$folder_model  = $this->ask('Folder name (ex: Models)', 'Models');
 		$folder_model  = (empty($folder_model)) ? 'Models' : $folder_model;
@@ -460,7 +545,7 @@ class LaravelCommands extends Command
 		{
 			$this->info('Function "' . $config->detail->table . '()" already exists in ' . $config->master->model . '.');
 			$this->waitKey();
-			return printModelMenu();
+			return $this->printModelMenu();
 		}
 
 		// DETAIL
@@ -503,7 +588,7 @@ class LaravelCommands extends Command
 		{
 			$this->info('Function "' . $config->master->table . '()" already exists in ' . $config->detail->model . '.');
 			$this->waitKey();
-			return printModelMenu();
+			return $this->printModelMenu();
 		}
 	}
 
